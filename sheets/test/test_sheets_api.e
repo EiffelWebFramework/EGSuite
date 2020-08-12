@@ -27,17 +27,21 @@ feature -- Tests
 
 	test_create_sheet
 		local
-			esapi: EG_SHEETS_API
+			l_esapi: EG_SHEETS_API
 		do
-			create esapi.make (last_token.token)
-			if attached esapi.create_spreedsheet as l_spreedsheet then
-				if esapi.has_error then
+			-- https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets
+			create l_esapi.make (last_token.token)
+			if attached l_esapi.create_spreedsheet as l_spreedsheet then
+				if l_esapi.has_error then
 --					debug ("test_create_sheet")
-						print ("Error:  test_create_sheet %N" )
-						print ("Error: " + esapi.error_message)
+						print ("test_create_sheet-> Error   %N" )
+						print ("test_create_sheet-> Error: msg:" + l_esapi.error_message)
+						print ("test_create_sheet-> See codes here: https://developers.google.com/maps-booking/reference/rest-api-v3/status_codes")
 						print ("%N")
 --					end
-					check  cannot_create_the_spreedsheet: False end
+					check
+						cannot_create_the_spreedsheet: False
+					end
 				else
 					check  Json_Field_spreadsheetId: l_spreedsheet.has_substring ("spreadsheetId") end
 					check  Json_Field_properties: l_spreedsheet.has_substring ("properties") end
@@ -58,9 +62,9 @@ feature -- Tests
 
 	test_create_sheet_json
 		local
-			esapi: EG_SHEETS_JSON
+			l_esapi: EG_SHEETS_JSON
 		do
-			create esapi.make (last_token.token)
+			create l_esapi.make (last_token.token)
 		end
 
 end

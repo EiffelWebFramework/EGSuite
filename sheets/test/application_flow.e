@@ -72,10 +72,12 @@ feature {NONE} -- Initialization
 			api_service: OAUTH_SERVICE_I
 			file: FILE
 		do
+
 			check
 				attached api_key as l_api_key
 				attached api_secret as l_api_secret
 			then
+				print ("get_token_from_url-> api_key:'" + l_api_key + "' secret:'" + l_api_secret + "'" )
 				create Result.make_empty
 				create config.make_default (l_api_key, l_api_secret)
 					config.set_callback ("urn:ietf:wg:oauth:2.0:oob")
@@ -124,6 +126,7 @@ feature {NONE} -- Initialization
 				attached api_key as l_api_key
 				attached api_secret as l_api_secret
 			then
+				print ("refresh_access_token-> api_key:'" + l_api_key + "' secret:'" + l_api_secret + "'" )
 				create Result.make_empty
 				create google
 				create request.make ("POST", google.access_token_endpoint )
@@ -241,4 +244,6 @@ feature {NONE} -- Implementation
 	api_key: detachable STRING
 	api_secret: detachable STRING
 	empty_token: detachable OAUTH_TOKEN
+
+	
 end
