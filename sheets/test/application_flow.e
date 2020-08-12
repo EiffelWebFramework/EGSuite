@@ -180,7 +180,7 @@ feature -- Token
 
 feature {NONE} -- Implementation
 
-	api_key: STRING = "546059329455-7avhe84em3rfb6el439ld1cgr5c6dmqt.apps.googleusercontent.com" --"Du9tZw02U4r2vmxf6XmrYLrn"
+	api_key: STRING = "546059329455-7avhe84em3rfb6el439ld1cgr5c6dmqt.apps.googleusercontent.com"
 	api_secret: STRING = "i45lTLSjalghy5rcbk7us1x6"
 	empty_token: detachable OAUTH_TOKEN
 end
