@@ -6,13 +6,17 @@ note
 
 class
 	EG_SPREADSHEET_PROPERTIES
-
+inherit
+	ANY
+		redefine
+			default_create
+		end
 create
-	make
+	default_create
 
 feature {NONE} -- Initialization
 
-	make
+	default_create
 		do
 			create title.make_empty
 			create locale.make_empty
@@ -70,5 +74,11 @@ feature -- Element Change
 			locale := a_locale
 		ensure
 			locale_set: locale = a_locale
+		end
+
+	set_time_zone (a_time_zone: STRING)
+			-- Set time zone with `a_time_zone`
+		do
+			time_zone := a_time_zone
 		end
 end

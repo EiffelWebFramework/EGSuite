@@ -32,22 +32,28 @@ note
 class
 	EG_SPREEDSHEET
 
+inherit
+	ANY
+		redefine
+			default_create
+		end
+
 create
-	make
+	default_create
 
 feature -- {NONE}
 
-	make (a_id: STRING_8; a_url: STRING_8)
+	default_create
 		do
-			create id.make_from_string (a_id)
-			create url.make_from_string (a_url)
-			create properties.make
+			create id.make_from_string ("")
+			create url.make_from_string ("")
+			create properties
 			create {ARRAYED_LIST [EG_SHEETS]} sheets.make (0)
 			create {ARRAYED_LIST [EG_NAMED_RANGE]} named_ranges.make (0)
 			create {ARRAYED_LIST [EG_DEVELOPER_METADATA]} developer_metadata.make (0)
-		ensure
-			id_set: id.is_case_insensitive_equal (a_id)
-			url_set: url.is_case_insensitive_equal (a_url)
+		ensure then
+			id_set: id.is_empty
+			url_set: url.is_empty
 		end
 
 feature -- Access
@@ -93,8 +99,22 @@ feature -- Change Element
 		end
 
 	force_developer_metadata (a_metadata: EG_DEVELOPER_METADATA)
+			-- Set developer metadata `a_metadata` to metadata.
 		do
 			developer_metadata.force (a_metadata)
 		end
 
+feature {EG_SHEETS_JSON} -- Factory
+
+	set_id (a_id: STRING)
+			-- Set id with `a_id`.
+		do
+			create id.make_from_string (a_id)
+		end
+
+	set_url (a_url: STRING)
+			-- Set url with `a_url`
+		do
+			create url.make_from_string (a_url)
+		end
 end

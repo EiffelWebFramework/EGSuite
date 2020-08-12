@@ -40,24 +40,71 @@ feature -- Post
 		note
 			EIS:"name=create.spreedsheets", "src=https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/create", "protocol=uri"
 		do
-			create Result.make ("", "")
+			create Result
 			if attached eg_sheets_api.create_spreedsheet  as s then
 				if attached parsed_json (s) as j then
+					Result := eg_spreadsheet (Void, j)
 				else
 					-- set error
 				end
 			end
 		end
 
+feature -- Error
+
+	last_error: detachable STRING
+			-- Last error message.
+			-- maybe we can create an specific EG_ERROR.
 
 feature -- Implementation Factory
 
 	eg_spreadsheet (a_spreadsheet: detachable like eg_spreadsheet; a_json: JSON_VALUE): EG_SPREEDSHEET
 			--
 		do
-			create Result.make ("", "")
+			if a_spreadsheet /= Void then
+				Result := a_spreadsheet
+			else
+				create Result
+			end
+			if attached string_value_from_json (a_json, "spreadsheetId") as l_id then
+				Result.set_id (l_id)
+			end
+			if attached string_value_from_json (a_json, "spreadsheetUrl") as l_url then
+				Result.set_url (l_url)
+			end
+			Result.set_protperty (eg_spreadsheet_properties (a_json))
+
 		end
 
+feature {NONE} -- JSON To Eiffel
+
+	eg_spreadsheet_properties (a_json: JSON_VALUE): EG_SPREADSHEET_PROPERTIES
+			--
+		do
+			create Result
+			if attached {JSON_OBJECT} json_value (a_json, "properties") as l_properties then
+				if attached string_value_from_json (l_properties, "title") as l_title then
+					Result.set_title (l_title)
+				end
+				if attached string_value_from_json (l_properties, "locale") as l_locale then
+					Result.set_locale (l_locale)
+				end
+				if attached string_value_from_json (l_properties, "autoRecalc") as l_auto_recalc then
+					if l_auto_recalc.is_case_insensitive_equal ("ON_CHANGE") then
+						Result.auto_recalc.set_on_change
+					end
+					if l_auto_recalc.is_case_insensitive_equal ("MINUTE") then
+						Result.auto_recalc.set_minute
+					end
+					if l_auto_recalc.is_case_insensitive_equal ("HOUR") then
+						Result.auto_recalc.set_hour
+					end
+				end
+				if attached string_value_from_json (l_properties, "timeZone") as l_time_zone then
+					Result.set_time_zone (l_time_zone)
+				end
+			end
+		end
 
 
 feature {NONE} -- Implementation
