@@ -17,6 +17,7 @@ feature -- {NONE}
 
 	make
 		do
+			set_from_json_credentials_file_path (create {PATH}.make_from_string ("/home/pg/tmp/eg-sheets/eg-sheets_credentials_eg-suite-desktop-api.json"))
 			retrieve_access_token
 			test_create_sheet
 		end
