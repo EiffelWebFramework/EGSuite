@@ -44,7 +44,7 @@ feature -- Access
 	spreadsheet_id: detachable STRING
 
 
-feature -- Spreedsheets
+feature -- Spreedsheets Operations
 
 	create_spreedsheet: detachable STRING
 			-- POST /spreadsheets
@@ -62,7 +62,9 @@ feature -- Spreedsheets
 		end
 
 	get_from_id (a_spreadsheet_id: attached like spreadsheet_id): detachable like last_response.body
-			-- https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/get
+			-- POST /spreadsheets/`a_spreadsheet_id'
+		note
+			EIS:"name=get.spreedsheets", "src=https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/get", "protocol=uri"
 		require
 			not a_spreadsheet_id.is_empty
 		do
