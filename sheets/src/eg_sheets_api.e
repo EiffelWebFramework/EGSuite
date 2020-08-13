@@ -72,23 +72,42 @@ feature -- Spreedsheets Operations
 			EIS:"name=get.spreedsheets", "src=https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/get", "protocol=uri"
 		require
 			not a_spreadsheet_id.is_empty
+		local
+			l_param: STRING
+			l_params: STRING_TABLE [STRING]
+			l_tuple: like parameters.item
 		do
-			api_post_call (sheets_url ("spreadsheets/" + a_spreadsheet_id, Void ), Void, Void)
+			logger.write_information ("Now getting sheet from id:" + a_spreadsheet_id)
+			l_param := "includeGridData=true"
+			l_param.append ("&fields=sheets.properties")
+			create l_params.make (2)
+			l_params.extend ("includeGridData", "true")
+			l_params.extend ("fields", "sheets.properties")
+			create l_tuple
+
+			api_get_call (sheets_url ("spreadsheets/" + a_spreadsheet_id, Void), l_params)
 			check
 				attached last_response as l_response and then
 				attached l_response.body as l_body
 			then
-				parse_last_response
-				Result := l_body
+				if l_response.status = {HTTP_STATUS_CODE}.ok then
+					parse_last_response
+					Result := l_body
+				elseif l_response.status = {HTTP_STATUS_CODE}.not_found then
+					logger.write_error ("get_from_id-> Not found:" + l_response.status.out + " %NBody: " + l_body)
+				else
+					logger.write_error ("get_from_id-> Status code invalid:" + l_response.status.out + " %NBody: " + l_body)
+				end
 			end
 		end
 
 feature -- Parameters Factory
 
 	parameters (a_params: detachable STRING_TABLE [STRING] ): detachable ARRAY [detachable TUPLE [name: STRING; value: STRING]]
+			-- @JV please add a call example
 		local
-			l_result: detachable ARRAY [detachable TUPLE [name: STRING; value: STRING]]
-			l_tuple : detachable TUPLE [name: STRING; value: STRING]
+			l_result: like parameters
+			l_tuple : like parameters.item
 			i: INTEGER
 		do
 			if attached a_params then
@@ -105,6 +124,7 @@ feature -- Parameters Factory
 				Result := l_result
 			end
 		end
+
 
 feature -- Error Report
 
@@ -210,6 +230,7 @@ feature {NONE} -- Implementation
 			api_service: OAUTH_20_SERVICE
 			config: OAUTH_CONFIG
 		do
+			logger.write_debug ("internal_api_call-> a_api_url:" + a_api_url + " method:" + a_method)
 				-- TODO improve this, so we can check the required scopes before we
 				-- do an api call.
 			create config.make_default ("", "")
