@@ -23,6 +23,9 @@ feature {NONE} -- Initialization
 			get_token
 			if last_token.token.is_empty then
 				logger.write_warning ("retrieve_access_token-> There is something wrong token is empty")
+				check
+					not_happening: False
+				end
 			else
 				logger.write_debug ("retrieve_access_token-> Let's play with the API, token seems ok:" + last_token.token)
 			end
@@ -184,6 +187,14 @@ feature -- Status Setting
 					end
 				end
 			end
+		end
+
+feature -- Status report
+
+	token_is_valid: BOOLEAN
+			-- @JV: is that enough? is there a last_token.valid function?
+		do
+			Result := not last_token.token.is_empty
 		end
 
 feature -- Serialize Access Token
