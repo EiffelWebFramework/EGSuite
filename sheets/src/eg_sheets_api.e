@@ -5,6 +5,10 @@ note
 
 class
 	EG_SHEETS_API
+
+inherit
+	LOGGABLE
+
 create
 	make
 
@@ -12,6 +16,7 @@ feature {NONE} -- Initialization
 
 	make (a_access_token: READABLE_STRING_32)
 		do
+			default_create
 				-- Using a code verifier
 			access_token := a_access_token
 			enable_version_4
@@ -222,10 +227,10 @@ feature {NONE} -- Implementation
 			create l_access_token.make_token_secret (access_token, "NOT_NEEDED")
 				--| Todo improve access_token to create a token without a secret.
 			if attached l_access_token as ll_access_token then
-				print ("%NGot the Access Token!%N");
+				logger.write_information ("internal_api_call->Got the Access Token:" + ll_access_token.token);
 
 					--Now let's go and check if the request is signed correcty
-				print ("%NNow we're going to verify our credentials...%N");
+				logger.write_information ("internal_api_call->Now we're going to verify our credentials...%N");
 					-- Build the request and authorize it with OAuth.
 				create request.make (a_method, a_api_url)
 					-- Workaorund to make it work with Google API
