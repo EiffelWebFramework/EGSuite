@@ -117,13 +117,13 @@ feature -- Error Report
 						if attached {JSON_OBJECT} l_json_parser.parsed_json_value as l_main_jso then
 							if attached {JSON_OBJECT} l_main_jso.item ("error") as l_error_jso then
 								if attached {JSON_NUMBER} l_error_jso.item ("code") as l_jso then
-									print ("parse_last_response-> error code:" + l_jso.representation)
+									print ("parse_last_response-> error code:" + l_jso.representation + "%N")
 								end
 								if attached {JSON_STRING} l_error_jso.item ("message") as l_jso then
-									print ("parse_last_response-> error message:" + l_jso.unescaped_string_8)
+									print ("parse_last_response-> error message:" + l_jso.unescaped_string_8 + "%N")
 								end
 								if attached {JSON_STRING} l_error_jso.item ("status") as l_jso then
-									print ("parse_last_response-> error status:" + l_jso.unescaped_string_8)
+									print ("parse_last_response-> error status:" + l_jso.unescaped_string_8 + "%N")
 								end
 							end
 						end

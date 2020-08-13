@@ -36,7 +36,7 @@ feature -- Tests
 				if l_esapi.has_error then
 --					debug ("test_create_sheet")
 						print ("test_create_sheet-> Error   %N" )
-						print ("test_create_sheet-> Error: msg:" + l_esapi.error_message)
+						print ("test_create_sheet-> Error: msg:" + l_esapi.error_message + "%N")
 						print ("test_create_sheet-> See codes here: https://developers.google.com/maps-booking/reference/rest-api-v3/status_codes")
 						print ("%N")
 --					end
