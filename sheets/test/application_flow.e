@@ -9,6 +9,8 @@ deferred class
 inherit
 	ARGUMENTS
 
+	LOGGABLE
+
 
 feature {NONE} -- Initialization
 
@@ -20,13 +22,9 @@ feature {NONE} -- Initialization
 			create last_token.make_empty
 			get_token
 			if last_token.token.is_empty then
-				debug
-					print ("There is something wwrong")
-				end
+				logger.write_warning ("retrieve_access_token-> There is something wrong token is empty")
 			else
-				debug
-					print ("Let's play with the API")
-				end
+				logger.write_debug ("retrieve_access_token-> Let's play with the API, token seems ok:" + last_token.token)
 			end
 		end
 
@@ -38,7 +36,6 @@ feature {NONE} -- Initialization
 			l_date_now: DATE_TIME
 			l_diff:  INTEGER_64
 		do
-
 			create {PLAIN_TEXT_FILE} file.make_with_name ("token.access")
 			if file.exists then
 				file.open_read
@@ -54,10 +51,11 @@ feature {NONE} -- Initialization
 				else
 					create token.make_empty
 				end
+				logger.write_debug ("get_token-> token got from file")
 				file.close
 			else
 				token := get_token_from_url
-
+				logger.write_debug ("get_token-> token got from url")
 			end
 			last_token := token
 		end
@@ -72,26 +70,25 @@ feature {NONE} -- Initialization
 			api_service: OAUTH_SERVICE_I
 			file: FILE
 		do
-
 			check
 				attached api_key as l_api_key
 				attached api_secret as l_api_secret
 			then
-				print ("get_token_from_url-> api_key:'" + l_api_key + "' secret:'" + l_api_secret + "'" )
+				logger.write_debug ("get_token_from_url-> api_key:'" + l_api_key + "' secret:'" + l_api_secret + "'" )
 				create Result.make_empty
 				create config.make_default (l_api_key, l_api_secret)
-					config.set_callback ("urn:ietf:wg:oauth:2.0:oob")
+				config.set_callback ("urn:ietf:wg:oauth:2.0:oob")
 				config.set_scope ("https://www.googleapis.com/auth/spreadsheets")
 				create google
 				api_service := google.create_service (config)
-				print ("%N===Google OAuth Workflow ===%N")
+				logger.write_debug ("%N===Google OAuth Workflow ===%N")
 
 					-- Obtain the Authorization URL
-				print ("%NFetching the Authorization URL...");
+				logger.write_debug ("%NFetching the Authorization URL...");
 				if attached api_service.authorization_url (empty_token) as lauthorization_url then
-					print ("%NGot the Authorization URL!%N");
-					print ("%NNow go and authorize here:%N");
-					print (lauthorization_url);
+					logger.write_debug ("%NGot the Authorization URL!%N");
+					logger.write_debug ("%NNow go and authorize here:%N");
+					print ("get_token_from_url-> authorization_url: " + lauthorization_url);
 					print ("%NAnd paste the authorization code here%N");
 					io.read_line
 				end
@@ -126,7 +123,7 @@ feature {NONE} -- Initialization
 				attached api_key as l_api_key
 				attached api_secret as l_api_secret
 			then
-				print ("refresh_access_token-> api_key:'" + l_api_key + "' secret:'" + l_api_secret + "'" )
+				logger.write_debug ("refresh_access_token-> api_key:'" + l_api_key + "' secret:'" + l_api_secret + "'" )
 				create Result.make_empty
 				create google
 				create request.make ("POST", google.access_token_endpoint )
@@ -245,5 +242,5 @@ feature {NONE} -- Implementation
 	api_secret: detachable STRING
 	empty_token: detachable OAUTH_TOKEN
 
-	
+
 end
