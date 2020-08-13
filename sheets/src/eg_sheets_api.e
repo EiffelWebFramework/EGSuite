@@ -41,6 +41,8 @@ feature -- Access
 	version: STRING_8
 			-- Google Sheets version
 
+	spreadsheet_id: detachable STRING
+
 
 feature -- Spreedsheets
 
@@ -54,6 +56,22 @@ feature -- Spreedsheets
 				attached last_response as l_response and then
 				attached l_response.body as l_body
 			then
+				parse_last_response
+				Result := l_body
+			end
+		end
+
+	get_from_id (a_spreadsheet_id: attached like spreadsheet_id): detachable like last_response.body
+			-- https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/get
+		require
+			not a_spreadsheet_id.is_empty
+		do
+			api_post_call (sheets_url ("spreadsheets/" + a_spreadsheet_id, Void ), Void, Void)
+			check
+				attached last_response as l_response and then
+				attached l_response.body as l_body
+			then
+				parse_last_response
 				Result := l_body
 			end
 		end
@@ -82,6 +100,39 @@ feature -- Parameters Factory
 		end
 
 feature -- Error Report
+
+	parse_last_response
+		require
+			attached last_response
+		local
+			l_json_parser: JSON_PARSER
+		do
+			check
+				attached last_response as l_response
+			then
+				if attached l_response.body as l_body then
+					create l_json_parser.make_with_string (l_body)
+					l_json_parser.parse_content
+					if l_json_parser.is_valid then
+						if attached {JSON_OBJECT} l_json_parser.parsed_json_value as l_main_jso then
+							if attached {JSON_OBJECT} l_main_jso.item ("error") as l_error_jso then
+								if attached {JSON_NUMBER} l_error_jso.item ("code") as l_jso then
+									print ("parse_last_response-> error code:" + l_jso.representation)
+								end
+								if attached {JSON_STRING} l_error_jso.item ("message") as l_jso then
+									print ("parse_last_response-> error message:" + l_jso.unescaped_string_8)
+								end
+								if attached {JSON_STRING} l_error_jso.item ("status") as l_jso then
+									print ("parse_last_response-> error status:" + l_jso.unescaped_string_8)
+								end
+							end
+						end
+					else
+						print ("parse_last_response-> Error: Invalid json body content:" + l_body + "%N")
+					end
+				end
+			end
+		end
 
 	has_error: BOOLEAN
 			-- Last api call raise an error?
