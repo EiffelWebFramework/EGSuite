@@ -20,7 +20,7 @@ feature -- {NONE}
 			logger.write_information ("make-> ======================> Starting application")
 			set_from_json_credentials_file_path (create {PATH}.make_from_string ("/home/pg/tmp/eg-sheets/eg-sheets_credentials_eg-suite-desktop-api.json"))
 			retrieve_access_token
-			test_create_sheet
+--			test_create_sheet
 			test_get_sheet ("1v1N4nRa6mmLcP9rUuyQPiCnLuUcBQFDEC7E0CDg3ASI")
 		end
 
