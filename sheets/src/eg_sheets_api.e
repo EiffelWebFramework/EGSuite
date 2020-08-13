@@ -73,31 +73,38 @@ feature -- Spreedsheets Operations
 		require
 			not a_spreadsheet_id.is_empty
 		local
-			l_param: STRING
+			l_file: PLAIN_TEXT_FILE
 			l_params: STRING_TABLE [STRING]
-			l_tuple: like parameters.item
 		do
+
 			logger.write_information ("Now getting sheet from id:" + a_spreadsheet_id)
-			l_param := "includeGridData=true"
-			l_param.append ("&fields=sheets.properties")
 			create l_params.make (2)
-			l_params.extend ("includeGridData", "true")
-			l_params.extend ("fields", "sheets.properties")
-			create l_tuple
+			l_params.extend ("true", "includeGridData") -- all content
+--			l_params.extend ("sheets.properties", "fields") -- properties only
 
 			api_get_call (sheets_url ("spreadsheets/" + a_spreadsheet_id, Void), l_params)
 			check
 				attached last_response as l_response and then
 				attached l_response.body as l_body
 			then
+				parse_last_response
 				if l_response.status = {HTTP_STATUS_CODE}.ok then
-					parse_last_response
 					Result := l_body
+
+					create l_file.make_create_read_write ("/tmp/hitme_sheet_json.json")
+					logger.write_information ("get_from_id->Writing body into " + l_file.path.utf_8_name)
+					l_file.close
+					l_file.wipe_out
+					l_file.open_append
+
+					l_file.put_string (l_body)
+					l_file.close
 				elseif l_response.status = {HTTP_STATUS_CODE}.not_found then
 					logger.write_error ("get_from_id-> Not found:" + l_response.status.out + " %NBody: " + l_body)
 				else
 					logger.write_error ("get_from_id-> Status code invalid:" + l_response.status.out + " %NBody: " + l_body)
 				end
+
 			end
 		end
 
@@ -137,7 +144,11 @@ feature -- Error Report
 			check
 				attached last_response as l_response
 			then
+				if l_response.status = {HTTP_STATUS_CODE}.unauthorized then
+					logger.write_error ("parse_last_response->Unauthorized status, review your authorization credentials")
+				end
 				if attached l_response.body as l_body then
+					logger.write_debug ("parse_last_response->body:" + l_body)
 					create l_json_parser.make_with_string (l_body)
 					l_json_parser.parse_content
 					if l_json_parser.is_valid then
