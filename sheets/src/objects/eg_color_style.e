@@ -20,23 +20,6 @@ note
 class
 	EG_COLOR_STYLE
 
-inherit
-	ANY
-		redefine
-			default_create
-		end
-
-create
-	default_create
-
-
-feature {NONE} -- Initialization
-
-	default_create
-		do
-			create rgb_color
-		end
-
 feature -- Access
 
 	rgb_color: detachable EG_COLOR

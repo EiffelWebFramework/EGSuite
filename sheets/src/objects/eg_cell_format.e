@@ -89,9 +89,72 @@ feature -- Access
 	text_format: EG_TEXT_FORMAT
 			-- The format of the text in the cell (unless overridden by a format run).
 
-	hyperlinkDisplayType: detachable EG_HYPERLINK_DISPLAY_TYPE
+	hyperlink_display_type: detachable EG_HYPERLINK_DISPLAY_TYPE
 			-- How a hyperlink, if it exists, should be displayed in the cell. 		
 
 	text_rotation: detachable EG_TEXT_ROTATION
 			-- The rotation applied to text in a cell
+
+feature -- Change Element
+
+	set_number_format (a_format: EG_NUMBER_FORMAT)
+		do
+			number_format := a_format
+		end
+
+	set_background_color (a_bg_color: EG_COLOR)
+		do
+			background_color := a_bg_color
+		end
+
+	set_background_color_style (a_bg_color_style: EG_COLOR_STYLE)
+		do
+			background_color_style := a_bg_color_style
+		end
+
+	set_borders (a_borders: EG_BORDERS)
+		do
+			borders := a_borders
+		end
+
+	set_padding (a_padding: EG_PADDING)
+		do
+			padding := a_padding
+		end
+
+	set_horizontal_alignment (ha: EG_HORIZONTAL_ALIGN)
+		do
+			horizontal_alignment := ha
+		end
+
+	set_vertical_alignment (a_val: EG_VERTICAL_ALIGN)
+		do
+			vertical_alignment := a_val
+		end
+
+	set_wrap_strategy (a_val: EG_WRAP_STRATEGY)
+		do
+			wrap_strategy := a_val
+		end
+
+	set_text_direction (a_val: EG_TEXT_DIRECTION)
+		do
+			text_direction := a_val
+		end
+
+	set_text_format (a_val: EG_TEXT_FORMAT)
+		do
+			text_format := a_val
+		end
+
+	set_hyperlink_display_type (a_val: EG_HYPERLINK_DISPLAY_TYPE)
+		do
+			hyperlink_display_type := a_val
+		end
+
+	set_text_rotation (a_val: EG_TEXT_ROTATION)
+		do
+			text_rotation := a_val
+		end
+
 end

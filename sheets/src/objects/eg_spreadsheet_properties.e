@@ -50,7 +50,7 @@ feature -- Access
 			-- The default format of all cells in the spreadsheet.
 			-- CellData.effectiveFormat will not be set if the cell's format is equal to this default format. This field is read-only.
 
-	iterative_calculation_settings: EG_ITERATIVE_CALCULATION_SETTINGS
+	iterative_calculation_settings: detachable EG_ITERATIVE_CALCULATION_SETTINGS
 			-- Determines whether and how circular references are resolved with iterative calculation.
 			-- Absence of this field means that circular references result in calculation errors.
 

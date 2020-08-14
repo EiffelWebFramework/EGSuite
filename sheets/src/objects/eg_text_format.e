@@ -40,7 +40,8 @@ feature {NONE} -- Initialization
 		do
 			create foreground_color
 			create foreground_color_style
-			create font_family.make_from_string ("arial,sans,sans-serif")
+			create font_family.make_empty
+			font_size := 0
 		end
 
 feature -- Access
@@ -68,5 +69,75 @@ feature -- Access
 
 	underline: BOOLEAN
 			-- True if the text is underlined.
+
+
+feature -- Change Element
+
+	set_foreground_color (a_color: EG_COLOR)
+			-- Set `foreground_color` with `a_color`.
+		do
+			foreground_color := a_color
+		ensure
+			foreground_color_set: foreground_color = a_color
+		end
+
+	set_foreground_color_style (a_color: EG_COLOR_STYLE)
+			-- Set `foreground_color_style` with `a_color`.
+		do
+			foreground_color_style := a_color
+		ensure
+			foreground_color_style_set: foreground_color_style = a_color
+		end
+
+	set_font_family (a_font: STRING)
+			-- Set `font_family` with `font`.
+			--| how do we know if a font is valid?
+		do
+			font_family := a_font
+		ensure
+			font_family_set: font_family = a_font
+		end
+
+	set_font_size (a_size: INTEGER)
+			-- Set `font_size` with `a_size`.
+		require
+			valid_size: a_size > 0
+		do
+			font_size := a_size
+		ensure
+			font_size_set: font_size = a_size
+		end
+
+	set_bold (a_bold: BOOLEAN)
+			-- Set `bold` with `a_bold`.
+		do
+			bold := a_bold
+		ensure
+			bold_set: bold = a_bold
+		end
+
+	set_italic (a_italic: BOOLEAN)
+			-- Set `italic` with `a_italic`.
+		do
+			italic := a_italic
+		ensure
+			italic_set: italic = a_italic
+		end
+
+	set_strikethrough (a_strikethrough: BOOLEAN)
+			-- Set `strikethrough` with `a_strikethrough`.
+		do
+			strikethrough := a_strikethrough
+		ensure
+			strikethrough_set: strikethrough = a_strikethrough
+		end
+
+	set_underline (a_underline: BOOLEAN)
+			-- Set `underline` with `a_underline`.
+		do
+			underline := a_underline
+		ensure
+			underline_set: underline = a_underline
+		end
 
 end

@@ -45,8 +45,8 @@ feature -- {NONE}
 
 	default_create
 		do
-			create id.make_from_string ("")
-			create url.make_from_string ("")
+			create id.make_empty
+			create url.make_empty
 			create properties
 			create {ARRAYED_LIST [EG_SHEETS]} sheets.make (0)
 			create {ARRAYED_LIST [EG_NAMED_RANGE]} named_ranges.make (0)

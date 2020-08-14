@@ -80,6 +80,8 @@ feature {NONE} -- JSON To Eiffel
 
 	eg_spreadsheet_properties (a_json: JSON_VALUE): EG_SPREADSHEET_PROPERTIES
 			--
+		local
+			l_cell_format: EG_CELL_FORMAT
 		do
 			create Result
 			if attached {JSON_OBJECT} json_value (a_json, "properties") as l_properties then
@@ -92,19 +94,165 @@ feature {NONE} -- JSON To Eiffel
 				if attached string_value_from_json (l_properties, "autoRecalc") as l_auto_recalc then
 					if l_auto_recalc.is_case_insensitive_equal ("ON_CHANGE") then
 						Result.auto_recalc.set_on_change
-					end
-					if l_auto_recalc.is_case_insensitive_equal ("MINUTE") then
+					elseif l_auto_recalc.is_case_insensitive_equal ("MINUTE") then
 						Result.auto_recalc.set_minute
-					end
-					if l_auto_recalc.is_case_insensitive_equal ("HOUR") then
+					elseif l_auto_recalc.is_case_insensitive_equal ("HOUR") then
 						Result.auto_recalc.set_hour
 					end
 				end
 				if attached string_value_from_json (l_properties, "timeZone") as l_time_zone then
 					Result.set_time_zone (l_time_zone)
 				end
+				if attached {JSON_OBJECT} json_value (l_properties, "defaultFormat") as l_default_format then
+				end
 			end
 		end
+
+
+	default_format (a_json: JSON_OBJECT): EG_CELL_FORMAT
+		do
+			create Result
+
+			if attached {JSON_OBJECT} json_value (a_json, "backgroundColor") as l_background_color then
+				Result.set_background_color (eg_color (l_background_color))
+			end
+			if attached {JSON_OBJECT} json_value (a_json, "padding") as l_padding then
+				Result.set_padding (padding (l_padding))
+			end
+			if attached string_value_from_json (a_json, "verticalAlignment") as l_alignment then
+				if l_alignment.is_case_insensitive_equal ("BOTTOM")  then
+					Result.vertical_alignment.set_bottom
+				elseif l_alignment.is_case_insensitive_equal ("MIDDLE")  then
+					Result.vertical_alignment.set_middle
+				elseif l_alignment.is_case_insensitive_equal ("TOP")  then
+					Result.vertical_alignment.set_top
+				end
+			end
+			if attached string_value_from_json (a_json, "wrapStrategy") as l_wrap_strategy then
+				if l_wrap_strategy.is_case_insensitive_equal ("OVERFLOW_CELL")  then
+					Result.wrap_strategy.set_overflow_cell
+				end
+				if l_wrap_strategy.is_case_insensitive_equal ("LEGACY_WRAP")  then
+					Result.wrap_strategy.set_legacy_wrap
+				elseif l_wrap_strategy.is_case_insensitive_equal ("CLIP")  then
+					Result.wrap_strategy.set_clip
+				elseif l_wrap_strategy.is_case_insensitive_equal ("WRAP")  then
+					Result.wrap_strategy.set_wrap
+				end
+			end
+			if attached {JSON_OBJECT} json_value (a_json, "textFormat") as l_text_format then
+				Result.set_text_format (text_format (l_text_format))
+			end
+			if attached {JSON_OBJECT} json_value (a_json, "backgroundColorStyle") as l_background_color_style then
+				Result.set_background_color_style (eg_color_style (l_background_color_style))
+			end
+		end
+
+	eg_color (a_json: JSON_OBJECT): EG_COLOR
+		do
+			create Result
+			if attached integer_value_from_json (a_json, "red") as l_val then
+				Result.set_red (l_val)
+			elseif attached real_value_from_json (a_json, "red") as l_val then
+				Result.set_red (l_val)
+			end
+			if attached integer_value_from_json (a_json, "green") as l_val then
+				Result.set_green (l_val)
+			elseif attached real_value_from_json (a_json, "green") as l_val then
+				Result.set_green (l_val)
+			end
+			if attached integer_value_from_json (a_json, "blue") as l_val then
+				Result.set_blue (l_val)
+			elseif attached real_value_from_json (a_json, "blue") as l_val then
+				Result.set_blue (l_val)
+			end
+			if attached integer_value_from_json (a_json, "alpha") as l_val then
+				Result.set_alpha (l_val)
+			elseif attached real_value_from_json (a_json, "alpha") as l_val then
+				Result.set_alpha (l_val)
+			end
+		end
+
+	padding (a_json: JSON_OBJECT): EG_PADDING
+		do
+			create Result
+			if attached integer_value_from_json (a_json, "top") as l_val then
+				Result.set_top (l_val)
+			end
+			if attached integer_value_from_json (a_json, "right") as l_val then
+				Result.set_right (l_val)
+			end
+			if attached integer_value_from_json (a_json, "bottom") as l_val then
+				Result.set_bottom (l_val)
+			end
+			if attached integer_value_from_json (a_json, "left") as l_val then
+				Result.set_left (l_val)
+			end
+		end
+
+	text_format (a_json: JSON_OBJECT): EG_TEXT_FORMAT
+		do
+			create Result
+			if attached {JSON_OBJECT} json_value (a_json, "foregroundColor") as l_foreground_color then
+				Result.set_foreground_color (eg_color (l_foreground_color))
+			end
+			if attached {JSON_OBJECT} json_value (a_json, "foregroundColorStyle") as l_foreground_color_style then
+				Result.set_foreground_color_style (eg_color_style (l_foreground_color_style))
+			end
+			if attached string_value_from_json (a_json, "fontFamily") as l_font_family then
+				Result.set_font_family (l_font_family)
+			end
+			if attached integer_value_from_json (a_json, "fontSize") as l_font_size then
+				Result.set_font_size (l_font_size)
+			end
+			if attached boolean_value_from_json (a_json, "bold") as l_bold then
+				Result.set_bold (l_bold)
+			end
+			if attached boolean_value_from_json (a_json, "italic") as l_italic then
+				Result.set_italic (l_italic)
+			end
+			if attached boolean_value_from_json (a_json, "strikethrough") as l_strikethrough then
+				Result.set_strikethrough (l_strikethrough)
+			end
+			if attached boolean_value_from_json (a_json, "underline") as l_underline then
+				Result.set_strikethrough (l_underline)
+			end
+		end
+
+	eg_color_style (a_json: JSON_OBJECT): EG_COLOR_STYLE
+		local
+			l_tc: EG_THEME_COLOR
+		do
+			create Result
+			if attached {JSON_OBJECT} json_value (a_json, "rgbColor") as l_rgbcolor then
+				Result.set_rgb (eg_color (l_rgbcolor))
+			elseif
+				attached string_value_from_json (a_json, "themeColor") as l_theme_color
+			then
+				create l_tc
+				if l_theme_color.is_case_insensitive_equal ("TEXT")  then
+					l_tc.set_text
+				elseif l_theme_color.is_case_insensitive_equal ("BACKGROUND")  then
+					l_tc.set_background
+				elseif l_theme_color.is_case_insensitive_equal ("ACCENT1")  then
+					l_tc.set_accent1
+				elseif l_theme_color.is_case_insensitive_equal ("ACCENT2")  then
+					l_tc.set_accent2
+				elseif l_theme_color.is_case_insensitive_equal ("ACCENT3")  then
+					l_tc.set_accent3
+				elseif l_theme_color.is_case_insensitive_equal ("ACCENT4")  then
+					l_tc.set_accent4
+				elseif l_theme_color.is_case_insensitive_equal ("ACCENT5")  then
+					l_tc.set_accent5
+				elseif l_theme_color.is_case_insensitive_equal ("ACCENT6")  then
+					l_tc.set_accent6
+				elseif l_theme_color.is_case_insensitive_equal ("LINK")  then
+					l_tc.set_link
+				end
+				Result.set_theme_color (l_tc)
+			end
+		end
+
 
 
 feature {NONE} -- Implementation

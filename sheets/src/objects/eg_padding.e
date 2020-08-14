@@ -8,30 +8,13 @@ note
 		  "bottom": integer,
 		  "left": integer
 		}
-	
+
 	]"
 	date: "$Date$"
 	revision: "$Revision$"
 
 class
 	EG_PADDING
-
-inherit
-
-	ANY
-		redefine
-			default_create
-		end
-
-feature {NONE} -- Initialization
-
-	default_create
-		do
-			top := 2
- 	        right := 3
-        	bottom := 2
-        	left := 3
-		end
 
 feature -- Access
 
