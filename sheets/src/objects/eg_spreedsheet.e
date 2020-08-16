@@ -48,7 +48,7 @@ feature -- {NONE}
 			create id.make_empty
 			create url.make_empty
 			create properties
-			create {ARRAYED_LIST [EG_SHEETS]} sheets.make (0)
+			create {ARRAYED_LIST [EG_SHEET]} sheets.make (0)
 			create {ARRAYED_LIST [EG_NAMED_RANGE]} named_ranges.make (0)
 			create {ARRAYED_LIST [EG_DEVELOPER_METADATA]} developer_metadata.make (0)
 		ensure then
@@ -64,7 +64,7 @@ feature -- Access
 	properties: EG_SPREADSHEET_PROPERTIES
 			-- Overall properties of a spreadsheet.
 
-	sheets: LIST [EG_SHEETS]
+	sheets: LIST [EG_SHEET]
 			-- The sheets that are part of a spreadsheet.
 
 	named_ranges: LIST [EG_NAMED_RANGE]
@@ -86,7 +86,7 @@ feature -- Change Element
 			properties_set: properties = a_properties
 		end
 
-	force_sheet (a_sheet: EG_SHEETS)
+	force_sheet (a_sheet: EG_SHEET)
 			-- Add a sheet `a_sheet` to the list of sheets.
 		do
 			sheets.force (a_sheet)

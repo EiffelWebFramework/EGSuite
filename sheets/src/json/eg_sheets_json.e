@@ -73,6 +73,16 @@ feature -- Implementation Factory
 				Result.set_url (l_url)
 			end
 			Result.set_protperty (eg_spreadsheet_properties (a_json))
+			if attached {JSON_ARRAY} json_value (a_json, "sheets") as l_sheets then
+				across l_sheets as ic loop
+				end
+			end
+			if attached {JSON_ARRAY} json_value (a_json, "namedRanges") as l_named_ranges then
+			end
+			if attached {JSON_ARRAY} json_value (a_json, "developerMetadata") as l_developer_metadata then
+				-- TODO
+			end
+
 
 		end
 
@@ -253,7 +263,11 @@ feature {NONE} -- JSON To Eiffel
 			end
 		end
 
+	eg_sheets (a_json: JSON_VALUE): EG_SHEET
+		do
+			create Result
 
+		end
 
 feature {NONE} -- Implementation
 
