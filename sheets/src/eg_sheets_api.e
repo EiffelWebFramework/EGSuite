@@ -107,7 +107,7 @@ feature -- Spreedsheets Operations
 			end
 		end
 
-	append (a_spreadsheet_id: attached like spreadsheet_id; a_data_line: ARRAY[STRING]): detachable like last_response.body
+	append_with_id (a_spreadsheet_id: attached like spreadsheet_id; a_data: detachable ARRAY[ARRAY[STRING]]): detachable like last_response.body
 		note
 			EIS:"name=append.spreedsheets", "src=https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values/append", "protocol=uri"
 		require
@@ -117,25 +117,32 @@ feature -- Spreedsheets Operations
 			l_range,
 			l_path_params_s: STRING
 			l_qry_params: STRING_TABLE [STRING]
+			l_post_data: TUPLE[data:PATH; content_type: STRING]
 		do
 			l_range := ""
 			logger.write_information ("append-> spreadsheed_id:" + a_spreadsheet_id)
 			-- path params
 			l_path_params_s := a_spreadsheet_id
 			l_path_params_s.append ("/values/{") -- spreadsheets/{spreadsheetId}/values/{range}:append
-			l_path_params_s.append ("") -- range ex. A1:B2 or namedRanges TRY: last not null index could be: =index(J:J,max(row(J:J)*(J:J<>"")))
+
+			l_path_params_s.append ("Sheet1!A:A") -- range ex. A1:B2 or namedRanges TRY: Sheet1!A:A | last not null index could be: =index(J:J,max(row(J:J)*(J:J<>"")))
+
 			l_path_params_s.append ("}:append")
 			-- qry params
 			create l_qry_params.make (2)
 			l_qry_params.extend ("RAW", "valueInputOption") -- INPUT_VALUE_OPTION_UNSPECIFIED|RAW|USER_ENTERED https://developers.google.com/sheets/api/reference/rest/v4/ValueInputOption
 			l_qry_params.extend ("INSERT_ROWS", "insertDataOption") -- OVERWRITE|INSERT_ROWS https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values/append#InsertDataOption
 			l_qry_params.extend ("true", "includeValuesInResponse") -- BOOLEAN
-			l_qry_params.extend ("true", "responseValueRenderOption") -- FORMATTED_VALUE| https://developers.google.com/sheets/api/reference/rest/v4/ValueRenderOption
+			l_qry_params.extend ("UNFORMATTED_VALUE", "responseValueRenderOption") -- UNFORMATTED_VALUE|FORMULA|FORMATTED_VALUE https://developers.google.com/sheets/api/reference/rest/v4/ValueRenderOption
+			l_qry_params.extend ("SERIAL_NUMBER", "responseDateTimeRenderOption") -- SERIAL_NUMBER|FORMATTED_STRING https://developers.google.com/sheets/api/reference/rest/v4/DateTimeRenderOption
 
-			api_get_call (sheets_url ("spreadsheets/" + l_path_params_s, Void), l_qry_params)
+			l_post_data := impl_append_post_data
+
+			api_post_call (sheets_url ("spreadsheets/" + l_path_params_s, Void), l_qry_params, l_post_data)
 			check
-				attached last_response as l_response and then
+				attached last_response as l_response
 				attached l_response.body as l_body
+				attached data_file as l_data_file
 			then
 				parse_last_response
 				if l_response.status = {HTTP_STATUS_CODE}.ok then
@@ -440,5 +447,50 @@ feature -- Service Endpoint
 
 	endpooint_sheets_url: STRING  = "https://sheets.googleapis.com"
 			--  base URL that specifies the network address of an API service.
+
+feature {NONE} -- Implementation
+
+	data_file: detachable PLAIN_TEXT_FILE
+
+
+	impl_append_post_data: TUPLE[data:PATH; content_type: STRING]
+		require
+			not attached data_file
+		local
+			l_res: JSON_OBJECT
+			l_jsa_main,
+			l_jsa_line: JSON_ARRAY
+
+		do
+			create l_res.make_with_capacity (5)
+			l_res.put_string ("ROWS", "majorDimension") -- "DIMENSION_UNSPECIFIED", "ROWS", "COLUMNS"
+
+			create l_jsa_main.make (10)
+
+			create l_jsa_line.make (2)
+			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("first_cell line 1"))
+			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("second_cell line 1"))
+			l_jsa_main.extend (l_jsa_line)
+
+			l_res.put (l_jsa_line, "values")
+
+
+			create data_file.make_open_temporary
+			check
+				attached data_file as l_df
+			then
+				l_df.put_string (l_jsa_main.representation)
+				Result := [l_df.path, "application/json"]
+			end
+
+
+--			Result.content_type :=
+
+
+			logger.write_debug ("impl_append_body-> Result: '" + Result.out + "'")
+		ensure
+			attached data_file
+		end
+
 end
 
