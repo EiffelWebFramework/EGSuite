@@ -130,5 +130,61 @@ feature -- Access
 			-- All column groups on this sheet, ordered by increasing range start index, then by group depth.
 
 	slicers: detachable LIST [EG_SLICER]
-			-- The slicers on this sheet.		
+			-- The slicers on this sheet.
+
+
+feature -- Element Change
+
+	set_properties (a_properties: like properties)
+			-- -- Set `properties` with `a_properties`.
+		do
+			properties := a_properties
+		ensure
+			properties_set: properties = a_properties
+		end
+
+	force_data (a_data: EG_GRID_DATA)
+			-- Add an item `a_data` to the list `data`.
+		local
+			l_data: like data
+		do
+			l_data := data
+			if l_data /= Void then
+				l_data.force (a_data)
+			else
+				create {ARRAYED_LIST [EG_GRID_DATA]}l_data.make (5)
+				l_data.force (a_data)
+			end
+			data := l_data
+		end
+
+	force_merges (a_merge: EG_GRID_RANGE)
+			-- Add an item `a_merge` to the list `merges`.
+		local
+			l_merges: like merges
+		do
+			l_merges := merges
+			if l_merges /= Void then
+				l_merges.force (a_merge)
+			else
+				create {ARRAYED_LIST [EG_GRID_RANGE]}l_merges.make (5)
+				l_merges.force (a_merge)
+			end
+			merges := l_merges
+		end
+
+	force_conditional_formats (a_item: EG_CONDITIONAL_FORMAT_RULE)
+			-- Add an item `a_item` to the list `conditional_formats`.
+		local
+			l_conditional_formats: like conditional_formats
+		do
+			l_conditional_formats := conditional_formats
+			if l_conditional_formats /= Void then
+				l_conditional_formats.force (a_item)
+			else
+				create {ARRAYED_LIST [EG_CONDITIONAL_FORMAT_RULE]}l_conditional_formats.make (5)
+				l_conditional_formats.force (a_item)
+			end
+			conditional_formats := l_conditional_formats
+		end
 end
