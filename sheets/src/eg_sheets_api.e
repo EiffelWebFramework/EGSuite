@@ -5,6 +5,9 @@ note
 
 class
 	EG_SHEETS_API
+inherit
+	LOGGABLE
+
 create
 	make
 
@@ -41,8 +44,11 @@ feature -- Access
 	version: STRING_8
 			-- Google Sheets version
 
-
 feature -- Spreedsheets
+	spreadsheet_id: detachable STRING
+
+
+feature -- Spreedsheets Operations
 
 	create_spreedsheet: detachable STRING
 			-- POST /spreadsheets
@@ -58,12 +64,104 @@ feature -- Spreedsheets
 			end
 		end
 
+	get_from_id (a_spreadsheet_id: attached like spreadsheet_id): detachable like last_response.body
+			-- POST /spreadsheets/`a_spreadsheet_id'
+		note
+			EIS:"name=get.spreedsheets", "src=https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/get", "protocol=uri"
+		require
+			not a_spreadsheet_id.is_empty
+		local
+			l_file: PLAIN_TEXT_FILE
+			l_qry_params: STRING_TABLE [STRING]
+		do
+
+			logger.write_information ("get_from_id-> Now getting sheet from id:" + a_spreadsheet_id)
+			create l_qry_params.make (2)
+			l_qry_params.extend ("true", "includeGridData") -- all content
+--			l_params.extend ("sheets.properties", "fields") -- properties only
+
+			api_get_call (sheets_url ("spreadsheets/" + a_spreadsheet_id, Void), l_qry_params)
+			check
+				attached last_response as l_response and then
+				attached l_response.body as l_body
+			then
+				parse_last_response
+				if l_response.status = {HTTP_STATUS_CODE}.ok then
+					Result := l_body
+
+					create l_file.make_create_read_write ("/tmp/hitme_sheet_json-get_from_id.json")
+					logger.write_information ("get_from_id->Writing body into " + l_file.path.utf_8_name)
+					l_file.close
+					l_file.wipe_out
+					l_file.open_append
+
+					l_file.put_string (l_body)
+					l_file.close
+				elseif l_response.status = {HTTP_STATUS_CODE}.not_found then
+					logger.write_error ("get_from_id-> Not found:" + l_response.status.out + " %NBody: " + l_body)
+				else
+					logger.write_error ("get_from_id-> Status code invalid:" + l_response.status.out + " %NBody: " + l_body)
+				end
+			end
+		end
+
+	append (a_spreadsheet_id: attached like spreadsheet_id; a_data_line: ARRAY[STRING]): detachable like last_response.body
+		note
+			EIS:"name=append.spreedsheets", "src=https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values/append", "protocol=uri"
+		require
+			not a_spreadsheet_id.is_empty
+		local
+			l_file: PLAIN_TEXT_FILE
+			l_range,
+			l_path_params_s: STRING
+			l_qry_params: STRING_TABLE [STRING]
+		do
+			l_range := ""
+			logger.write_information ("append-> spreadsheed_id:" + a_spreadsheet_id)
+			-- path params
+			l_path_params_s := a_spreadsheet_id
+			l_path_params_s.append ("/values/{") -- spreadsheets/{spreadsheetId}/values/{range}:append
+			l_path_params_s.append ("") -- range ex. A1:B2 or namedRanges TRY: last not null index could be: =index(J:J,max(row(J:J)*(J:J<>"")))
+			l_path_params_s.append ("}:append")
+			-- qry params
+			create l_qry_params.make (2)
+			l_qry_params.extend ("RAW", "valueInputOption") -- INPUT_VALUE_OPTION_UNSPECIFIED|RAW|USER_ENTERED https://developers.google.com/sheets/api/reference/rest/v4/ValueInputOption
+			l_qry_params.extend ("INSERT_ROWS", "insertDataOption") -- OVERWRITE|INSERT_ROWS https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values/append#InsertDataOption
+			l_qry_params.extend ("true", "includeValuesInResponse") -- BOOLEAN
+			l_qry_params.extend ("true", "responseValueRenderOption") -- FORMATTED_VALUE| https://developers.google.com/sheets/api/reference/rest/v4/ValueRenderOption
+
+			api_get_call (sheets_url ("spreadsheets/" + l_path_params_s, Void), l_qry_params)
+			check
+				attached last_response as l_response and then
+				attached l_response.body as l_body
+			then
+				parse_last_response
+				if l_response.status = {HTTP_STATUS_CODE}.ok then
+					Result := l_body
+
+					create l_file.make_create_read_write ("/tmp/hitme_sheet_json-append.json")
+					logger.write_information ("get_from_id->Writing body into " + l_file.path.utf_8_name)
+					l_file.close
+					l_file.wipe_out
+					l_file.open_append
+
+					l_file.put_string (l_body)
+					l_file.close
+				elseif l_response.status = {HTTP_STATUS_CODE}.not_found then
+					logger.write_error ("get_from_id-> Not found:" + l_response.status.out + " %NBody: " + l_body)
+				else
+					logger.write_error ("get_from_id-> Status code invalid:" + l_response.status.out + " %NBody: " + l_body)
+				end
+			end
+		end
+
 feature -- Parameters Factory
 
 	parameters (a_params: detachable STRING_TABLE [STRING] ): detachable ARRAY [detachable TUPLE [name: STRING; value: STRING]]
+			-- @JV please add a call example
 		local
-			l_result: detachable ARRAY [detachable TUPLE [name: STRING; value: STRING]]
-			l_tuple : detachable TUPLE [name: STRING; value: STRING]
+			l_result: like parameters
+			l_tuple : like parameters.item
 			i: INTEGER
 		do
 			if attached a_params then
@@ -82,6 +180,43 @@ feature -- Parameters Factory
 		end
 
 feature -- Error Report
+
+	parse_last_response
+		require
+			attached last_response
+		local
+			l_json_parser: JSON_PARSER
+		do
+			check
+				attached last_response as l_response
+			then
+				if l_response.status = {HTTP_STATUS_CODE}.unauthorized then
+					logger.write_error ("parse_last_response->Unauthorized status, review your authorization credentials")
+				end
+				if attached l_response.body as l_body then
+					logger.write_debug ("parse_last_response->body:" + l_body)
+					create l_json_parser.make_with_string (l_body)
+					l_json_parser.parse_content
+					if l_json_parser.is_valid then
+						if attached {JSON_OBJECT} l_json_parser.parsed_json_value as l_main_jso then
+							if attached {JSON_OBJECT} l_main_jso.item ("error") as l_error_jso then
+								if attached {JSON_NUMBER} l_error_jso.item ("code") as l_jso then
+									print ("parse_last_response-> error code:" + l_jso.representation + "%N")
+								end
+								if attached {JSON_STRING} l_error_jso.item ("message") as l_jso then
+									print ("parse_last_response-> error message:" + l_jso.unescaped_string_8 + "%N")
+								end
+								if attached {JSON_STRING} l_error_jso.item ("status") as l_jso then
+									print ("parse_last_response-> error status:" + l_jso.unescaped_string_8 + "%N")
+								end
+							end
+						end
+					else
+						print ("parse_last_response-> Error: Invalid json body content:" + l_body + "%N")
+					end
+				end
+			end
+		end
 
 	has_error: BOOLEAN
 			-- Last api call raise an error?
@@ -152,6 +287,7 @@ feature {NONE} -- Implementation
 			api_service: OAUTH_20_SERVICE
 			config: OAUTH_CONFIG
 		do
+			logger.write_debug ("internal_api_call-> a_api_url:" + a_api_url + " method:" + a_method)
 				-- TODO improve this, so we can check the required scopes before we
 				-- do an api call.
 			create config.make_default ("", "")
@@ -169,10 +305,10 @@ feature {NONE} -- Implementation
 			create l_access_token.make_token_secret (access_token, "NOT_NEEDED")
 				--| Todo improve access_token to create a token without a secret.
 			if attached l_access_token as ll_access_token then
-				print ("%NGot the Access Token!%N");
+				logger.write_information ("internal_api_call->Got the Access Token:" + ll_access_token.token);
 
 					--Now let's go and check if the request is signed correcty
-				print ("%NNow we're going to verify our credentials...%N");
+				logger.write_information ("internal_api_call->Now we're going to verify our credentials...%N");
 					-- Build the request and authorize it with OAuth.
 				create request.make (a_method, a_api_url)
 					-- Workaorund to make it work with Google API

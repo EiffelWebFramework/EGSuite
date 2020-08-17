@@ -156,5 +156,4 @@ feature -- Change Element
 		do
 			text_rotation := a_val
 		end
-
 end

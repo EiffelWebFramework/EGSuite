@@ -14,7 +14,6 @@ note
 	date: "$Date$"
 	revision: "$Revision$"
 	EIS: "name=Named Range", "src=https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets#namedrange", "protocol="
-
 class
 	EG_NAMED_RANGE
 

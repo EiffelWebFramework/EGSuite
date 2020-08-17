@@ -98,5 +98,4 @@ feature -- Element Change
 			visibility_set: visibility = a_visibility
 		end
 
-
 end

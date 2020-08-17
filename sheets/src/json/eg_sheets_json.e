@@ -266,8 +266,8 @@ feature {NONE} -- JSON To Eiffel
 	eg_sheets (a_json: JSON_VALUE): EG_SHEET
 		do
 			create Result
-
 		end
+
 
 feature {NONE} -- Implementation
 

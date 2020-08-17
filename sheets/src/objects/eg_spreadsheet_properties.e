@@ -76,7 +76,7 @@ feature -- Element Change
 			locale_set: locale = a_locale
 		end
 
-	set_time_zone (a_time_zone: STRING)
+  set_time_zone (a_time_zone: STRING)
 			-- Set time zone with `a_time_zone`
 		do
 			time_zone := a_time_zone
