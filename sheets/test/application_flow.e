@@ -9,7 +9,6 @@ deferred class
 inherit
 	ARGUMENTS
 
-=======
 	LOGGABLE
 
 
