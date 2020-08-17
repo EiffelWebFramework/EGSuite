@@ -5,7 +5,6 @@ note
 
 class
 	EG_SHEETS_API
-
 inherit
 	LOGGABLE
 
@@ -16,7 +15,6 @@ feature {NONE} -- Initialization
 
 	make (a_access_token: READABLE_STRING_32)
 		do
-			default_create
 				-- Using a code verifier
 			access_token := a_access_token
 			enable_version_4
@@ -46,6 +44,7 @@ feature -- Access
 	version: STRING_8
 			-- Google Sheets version
 
+feature -- Spreedsheets
 	spreadsheet_id: detachable STRING
 
 
@@ -61,7 +60,6 @@ feature -- Spreedsheets Operations
 				attached last_response as l_response and then
 				attached l_response.body as l_body
 			then
-				parse_last_response
 				Result := l_body
 			end
 		end
@@ -180,7 +178,6 @@ feature -- Parameters Factory
 				Result := l_result
 			end
 		end
-
 
 feature -- Error Report
 

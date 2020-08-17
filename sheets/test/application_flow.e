@@ -9,6 +9,7 @@ deferred class
 inherit
 	ARGUMENTS
 
+=======
 	LOGGABLE
 
 
@@ -252,6 +253,4 @@ feature {NONE} -- Implementation
 	api_key: detachable STRING
 	api_secret: detachable STRING
 	empty_token: detachable OAUTH_TOKEN
-
-
 end
