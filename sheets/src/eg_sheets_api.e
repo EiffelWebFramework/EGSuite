@@ -74,15 +74,15 @@ feature -- Spreedsheets Operations
 			not a_spreadsheet_id.is_empty
 		local
 			l_file: PLAIN_TEXT_FILE
-			l_params: STRING_TABLE [STRING]
+			l_qry_params: STRING_TABLE [STRING]
 		do
 
-			logger.write_information ("Now getting sheet from id:" + a_spreadsheet_id)
-			create l_params.make (2)
-			l_params.extend ("true", "includeGridData") -- all content
+			logger.write_information ("get_from_id-> Now getting sheet from id:" + a_spreadsheet_id)
+			create l_qry_params.make (2)
+			l_qry_params.extend ("true", "includeGridData") -- all content
 --			l_params.extend ("sheets.properties", "fields") -- properties only
 
-			api_get_call (sheets_url ("spreadsheets/" + a_spreadsheet_id, Void), l_params)
+			api_get_call (sheets_url ("spreadsheets/" + a_spreadsheet_id, Void), l_qry_params)
 			check
 				attached last_response as l_response and then
 				attached l_response.body as l_body
@@ -91,7 +91,7 @@ feature -- Spreedsheets Operations
 				if l_response.status = {HTTP_STATUS_CODE}.ok then
 					Result := l_body
 
-					create l_file.make_create_read_write ("/tmp/hitme_sheet_json.json")
+					create l_file.make_create_read_write ("/tmp/hitme_sheet_json-get_from_id.json")
 					logger.write_information ("get_from_id->Writing body into " + l_file.path.utf_8_name)
 					l_file.close
 					l_file.wipe_out
@@ -104,7 +104,56 @@ feature -- Spreedsheets Operations
 				else
 					logger.write_error ("get_from_id-> Status code invalid:" + l_response.status.out + " %NBody: " + l_body)
 				end
+			end
+		end
 
+	append (a_spreadsheet_id: attached like spreadsheet_id; a_data_line: ARRAY[STRING]): detachable like last_response.body
+		note
+			EIS:"name=append.spreedsheets", "src=https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values/append", "protocol=uri"
+		require
+			not a_spreadsheet_id.is_empty
+		local
+			l_file: PLAIN_TEXT_FILE
+			l_range,
+			l_path_params_s: STRING
+			l_qry_params: STRING_TABLE [STRING]
+		do
+			l_range := ""
+			logger.write_information ("append-> spreadsheed_id:" + a_spreadsheet_id)
+			-- path params
+			l_path_params_s := a_spreadsheet_id
+			l_path_params_s.append ("/values/{") -- spreadsheets/{spreadsheetId}/values/{range}:append
+			l_path_params_s.append ("") -- range ex. A1:B2 or namedRanges TRY: last not null index could be: =index(J:J,max(row(J:J)*(J:J<>"")))
+			l_path_params_s.append ("}:append")
+			-- qry params
+			create l_qry_params.make (2)
+			l_qry_params.extend ("RAW", "valueInputOption") -- INPUT_VALUE_OPTION_UNSPECIFIED|RAW|USER_ENTERED https://developers.google.com/sheets/api/reference/rest/v4/ValueInputOption
+			l_qry_params.extend ("INSERT_ROWS", "insertDataOption") -- OVERWRITE|INSERT_ROWS https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values/append#InsertDataOption
+			l_qry_params.extend ("true", "includeValuesInResponse") -- BOOLEAN
+			l_qry_params.extend ("true", "responseValueRenderOption") -- FORMATTED_VALUE| https://developers.google.com/sheets/api/reference/rest/v4/ValueRenderOption
+
+			api_get_call (sheets_url ("spreadsheets/" + l_path_params_s, Void), l_qry_params)
+			check
+				attached last_response as l_response and then
+				attached l_response.body as l_body
+			then
+				parse_last_response
+				if l_response.status = {HTTP_STATUS_CODE}.ok then
+					Result := l_body
+
+					create l_file.make_create_read_write ("/tmp/hitme_sheet_json-append.json")
+					logger.write_information ("get_from_id->Writing body into " + l_file.path.utf_8_name)
+					l_file.close
+					l_file.wipe_out
+					l_file.open_append
+
+					l_file.put_string (l_body)
+					l_file.close
+				elseif l_response.status = {HTTP_STATUS_CODE}.not_found then
+					logger.write_error ("get_from_id-> Not found:" + l_response.status.out + " %NBody: " + l_body)
+				else
+					logger.write_error ("get_from_id-> Status code invalid:" + l_response.status.out + " %NBody: " + l_body)
+				end
 			end
 		end
 
