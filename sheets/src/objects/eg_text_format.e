@@ -1,0 +1,143 @@
+note
+	description: "[
+	Object representing The format of a run of text in a cell. Absent values indicate that the field isn't specified. 
+		{
+		  "foregroundColor": {
+		    object (Color)
+		  },
+		  "foregroundColorStyle": {
+		    object (ColorStyle)
+		  },
+		  "fontFamily": string,
+		  "fontSize": integer,
+		  "bold": boolean,
+		  "italic": boolean,
+		  "strikethrough": boolean,
+		  "underline": boolean
+		}
+
+	]"
+	date: "$Date$"
+	revision: "$Revision$"
+	EIS: "name=Text format", "src=https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/other#TextFormat", "protocol=uri"
+
+class
+	EG_TEXT_FORMAT
+
+inherit
+
+	ANY
+		redefine
+			default_create
+		end
+
+create
+	default_create
+
+feature {NONE} -- Initialization
+
+	default_create
+		do
+			create foreground_color
+			create foreground_color_style
+			create font_family.make_empty
+			font_size := 0
+		end
+
+feature -- Access
+
+	foreground_color: EG_COLOR
+			-- The foreground color of the text.
+
+	foreground_color_style: EG_COLOR_STYLE
+			-- The foreground color of the text. If foregroundColor is also set, this field takes precedence.
+
+	font_family: STRING
+			-- The font family.
+
+	font_size: INTEGER
+			-- The size of the font.
+
+	bold: BOOLEAN
+			-- 	True if the text is bold.
+
+	italic: BOOLEAN
+			-- True if the text is italicized.
+
+	strikethrough: BOOLEAN
+			-- True if the text has a strikethrough.
+
+	underline: BOOLEAN
+			-- True if the text is underlined.
+
+
+feature -- Change Element
+
+	set_foreground_color (a_color: EG_COLOR)
+			-- Set `foreground_color` with `a_color`.
+		do
+			foreground_color := a_color
+		ensure
+			foreground_color_set: foreground_color = a_color
+		end
+
+	set_foreground_color_style (a_color: EG_COLOR_STYLE)
+			-- Set `foreground_color_style` with `a_color`.
+		do
+			foreground_color_style := a_color
+		ensure
+			foreground_color_style_set: foreground_color_style = a_color
+		end
+
+	set_font_family (a_font: STRING)
+			-- Set `font_family` with `font`.
+			--| how do we know if a font is valid?
+		do
+			font_family := a_font
+		ensure
+			font_family_set: font_family = a_font
+		end
+
+	set_font_size (a_size: INTEGER)
+			-- Set `font_size` with `a_size`.
+		require
+			valid_size: a_size > 0
+		do
+			font_size := a_size
+		ensure
+			font_size_set: font_size = a_size
+		end
+
+	set_bold (a_bold: BOOLEAN)
+			-- Set `bold` with `a_bold`.
+		do
+			bold := a_bold
+		ensure
+			bold_set: bold = a_bold
+		end
+
+	set_italic (a_italic: BOOLEAN)
+			-- Set `italic` with `a_italic`.
+		do
+			italic := a_italic
+		ensure
+			italic_set: italic = a_italic
+		end
+
+	set_strikethrough (a_strikethrough: BOOLEAN)
+			-- Set `strikethrough` with `a_strikethrough`.
+		do
+			strikethrough := a_strikethrough
+		ensure
+			strikethrough_set: strikethrough = a_strikethrough
+		end
+
+	set_underline (a_underline: BOOLEAN)
+			-- Set `underline` with `a_underline`.
+		do
+			underline := a_underline
+		ensure
+			underline_set: underline = a_underline
+		end
+
+end

@@ -6,13 +6,17 @@ note
 
 class
 	EG_SPREADSHEET_PROPERTIES
-
+inherit
+	ANY
+		redefine
+			default_create
+		end
 create
-	make
+	default_create
 
 feature {NONE} -- Initialization
 
-	make
+	default_create
 		do
 			create title.make_empty
 			create locale.make_empty
@@ -46,7 +50,7 @@ feature -- Access
 			-- The default format of all cells in the spreadsheet.
 			-- CellData.effectiveFormat will not be set if the cell's format is equal to this default format. This field is read-only.
 
-	iterative_calculation_settings: EG_ITERATIVE_CALCULATION_SETTINGS
+	iterative_calculation_settings: detachable EG_ITERATIVE_CALCULATION_SETTINGS
 			-- Determines whether and how circular references are resolved with iterative calculation.
 			-- Absence of this field means that circular references result in calculation errors.
 
@@ -70,5 +74,11 @@ feature -- Element Change
 			locale := a_locale
 		ensure
 			locale_set: locale = a_locale
+		end
+
+  set_time_zone (a_time_zone: STRING)
+			-- Set time zone with `a_time_zone`
+		do
+			time_zone := a_time_zone
 		end
 end
