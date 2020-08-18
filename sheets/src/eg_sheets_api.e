@@ -56,7 +56,7 @@ feature -- Spreedsheets Operations
 		note
 			EIS:"name=create.spreedsheets", "src=https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/create", "protocol=uri"
 		do
-			api_post_call (sheets_url ("spreadsheets", Void ), Void, Void)
+			api_post_call (sheets_url ("spreadsheets", Void ), Void, Void, Void)
 			if
 				attached last_response as l_response and then
 				attached l_response.body as l_body
@@ -117,45 +117,53 @@ feature -- Spreedsheets Operations
 			l_range,
 			l_path_params_s: STRING
 			l_qry_params: STRING_TABLE [STRING]
-			l_post_data: TUPLE[data:PATH; content_type: STRING]
+			l_post_data: STRING -- TUPLE[data:PATH; content_type: STRING]
+			url_encoder: URL_ENCODER
 		do
 			l_range := ""
 			logger.write_information ("append-> spreadsheed_id:" + a_spreadsheet_id)
 			-- path params
 			l_path_params_s := a_spreadsheet_id
-			l_path_params_s.append ("/values/{") -- spreadsheets/{spreadsheetId}/values/{range}:append
+			l_path_params_s.append ("/values/") -- spreadsheets/{spreadsheetId}/values/{range}:append
 
-			l_path_params_s.append ("Sheet1!A:A") -- range ex. A1:B2 or namedRanges TRY: Sheet1!A:A | last not null index could be: =index(J:J,max(row(J:J)*(J:J<>"")))
+				-- TODO add url encode to the query parameters.
+			create url_encoder
+			l_path_params_s.append (url_encoder.encoded_string ("Sheet1!A1:B5")) -- range ex. A1:B2 or namedRanges TRY: Sheet1!A:A | last not null index could be: =index(J:J,max(row(J:J)*(J:J<>"")))
 
-			l_path_params_s.append ("}:append")
+
+			l_path_params_s.append (":append")
 			-- qry params
 			create l_qry_params.make (2)
 			l_qry_params.extend ("RAW", "valueInputOption") -- INPUT_VALUE_OPTION_UNSPECIFIED|RAW|USER_ENTERED https://developers.google.com/sheets/api/reference/rest/v4/ValueInputOption
-			l_qry_params.extend ("INSERT_ROWS", "insertDataOption") -- OVERWRITE|INSERT_ROWS https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values/append#InsertDataOption
-			l_qry_params.extend ("true", "includeValuesInResponse") -- BOOLEAN
-			l_qry_params.extend ("UNFORMATTED_VALUE", "responseValueRenderOption") -- UNFORMATTED_VALUE|FORMULA|FORMATTED_VALUE https://developers.google.com/sheets/api/reference/rest/v4/ValueRenderOption
-			l_qry_params.extend ("SERIAL_NUMBER", "responseDateTimeRenderOption") -- SERIAL_NUMBER|FORMATTED_STRING https://developers.google.com/sheets/api/reference/rest/v4/DateTimeRenderOption
+--			l_qry_params.extend ("INSERT_ROWS", "insertDataOption") -- OVERWRITE|INSERT_ROWS https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values/append#InsertDataOption
+--			l_qry_params.extend ("true", "includeValuesInResponse") -- BOOLEAN
+--			l_qry_params.extend ("json", "alt") -- BOOLEAN
+--			alt=json
+--			l_qry_params.extend ("UNFORMATTED_VALUE", "responseValueRenderOption") -- UNFORMATTED_VALUE|FORMULA|FORMATTED_VALUE https://developers.google.com/sheets/api/reference/rest/v4/ValueRenderOption
+--			l_qry_params.extend ("SERIAL_NUMBER", "responseDateTimeRenderOption") -- SERIAL_NUMBER|FORMATTED_STRING https://developers.google.com/sheets/api/reference/rest/v4/DateTimeRenderOption
 
-			l_post_data := impl_append_post_data
 
-			api_post_call (sheets_url ("spreadsheets/" + l_path_params_s, Void), l_qry_params, l_post_data)
+			l_post_data := impl_append_post_data2
+
+				-- Google API append require body parameter instead of upload data.
+			api_post_call (sheets_url ("spreadsheets/" + l_path_params_s, Void), l_qry_params, l_post_data, Void)
+
 			check
 				attached last_response as l_response
 				attached l_response.body as l_body
-				attached data_file as l_data_file
 			then
 				parse_last_response
 				if l_response.status = {HTTP_STATUS_CODE}.ok then
 					Result := l_body
 
-					create l_file.make_create_read_write ("/tmp/hitme_sheet_json-append.json")
-					logger.write_information ("get_from_id->Writing body into " + l_file.path.utf_8_name)
-					l_file.close
-					l_file.wipe_out
-					l_file.open_append
+--					create l_file.make_create_read_write ("/tmp/hitme_sheet_json-append.json")
+--					logger.write_information ("get_from_id->Writing body into " + l_file.path.utf_8_name)
+--					l_file.close
+--					l_file.wipe_out
+--					l_file.open_append
 
-					l_file.put_string (l_body)
-					l_file.close
+--					l_file.put_string (l_body)
+--					l_file.close
 				elseif l_response.status = {HTTP_STATUS_CODE}.not_found then
 					logger.write_error ("get_from_id-> Not found:" + l_response.status.out + " %NBody: " + l_body)
 				else
@@ -270,25 +278,25 @@ feature -- Versions
 
 feature {NONE} -- Implementation
 
-	api_post_call (a_api_url: STRING; a_params: detachable STRING_TABLE [STRING]; a_upload_data: detachable TUPLE[data:PATH; content_type: STRING])
+	api_post_call (a_api_url: STRING; a_params: detachable STRING_TABLE [STRING]; a_payload: detachable STRING; a_upload_data: detachable TUPLE[data:PATH; content_type: STRING])
 			-- POST REST API call for `a_api_url'
 		do
-			internal_api_call (a_api_url, "POST", a_params, a_upload_data)
+			internal_api_call (a_api_url, "POST", a_params, a_payload, a_upload_data)
 		end
 
 	api_delete_call (a_api_url: STRING; a_params: detachable STRING_TABLE [STRING])
 			-- DELETE REST API call for `a_api_url'
 		do
-			internal_api_call (a_api_url, "DELETE", a_params, Void)
+			internal_api_call (a_api_url, "DELETE", a_params, Void, Void)
 		end
 
 	api_get_call (a_api_url: STRING; a_params: detachable STRING_TABLE [STRING])
 			-- GET REST API call for `a_api_url'
 		do
-			internal_api_call (a_api_url, "GET", a_params, Void)
+			internal_api_call (a_api_url, "GET", a_params, Void, Void)
 		end
 
-	internal_api_call (a_api_url: STRING; a_method: STRING; a_params: detachable STRING_TABLE [STRING]; a_upload_data: detachable TUPLE[filename:PATH; content_type: STRING])
+	internal_api_call (a_api_url: STRING; a_method: STRING; a_params: detachable STRING_TABLE [STRING]; a_payload: detachable STRING; a_upload_data: detachable TUPLE[filename:PATH; content_type: STRING])
 		note
 			EIS:"name=access token", "src=https://developers.google.com/identity/protocols/oauth2", "protocol=uri"
 		local
@@ -324,9 +332,16 @@ feature {NONE} -- Implementation
 					-- Workaorund to make it work with Google API
 					-- in other case it return HTTP 411 Length Required.
 					-- Todo check.
-				request.add_header ("Content-length", "0")
 				upload_data (a_method, request, a_upload_data)
 				add_parameters (a_method, request, a_params)
+				if attached a_payload then
+					request.add_header ("Content-length", a_payload.count.out)
+					request.add_header ("Content-Type", "application/json; charset=UTF-8")
+					request.add_payload (a_payload)
+				else
+					request.add_header ("Content-length", "")
+				end
+
 				api_service.sign_request (ll_access_token, request)
 				if attached {OAUTH_RESPONSE} request.execute as l_response then
 					last_response := l_response
@@ -490,6 +505,83 @@ feature {NONE} -- Implementation
 			logger.write_debug ("impl_append_body-> Result: '" + Result.out + "'")
 		ensure
 			attached data_file
+		end
+
+	impl_append_post_data2: STRING
+		local
+			l_res: JSON_OBJECT
+			l_jsa_main,
+			l_jsa_line: JSON_ARRAY
+			j_array: JSON_ARRAY
+
+--{
+--  "range": string,
+--  "majorDimension": enum (Dimension),
+--  "values": [
+--    array
+--  ]
+--}
+--//   "values": [
+--    //     [
+--    //       "Item",
+--    //       "Cost"
+--    //     ],
+--    //     [
+--    //       "Wheel",
+--    //       "$20.50"
+--    //     ],
+--    //     [
+--    //       "Door",
+--    //       "$15"
+--    //     ],
+--    //     [
+--    //       "Engine",
+--    //       "$100"
+--    //     ],
+--    //     [
+--    //       "Totals",
+--    //       "$135.50"
+--    //     ]
+--    //   ]
+
+		do
+			create l_res.make_with_capacity (5)
+			l_res.put_string ("Sheet1!A1:B5", "range")
+			l_res.put_string ("ROWS", "majorDimension") -- "DIMENSION_UNSPECIFIED", "ROWS", "COLUMNS"
+
+			create l_jsa_main.make (10)
+
+			create j_array.make (1)
+			create l_jsa_line.make (2)
+			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("Item"))
+			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("Cost"))
+			j_array.add (l_jsa_line)
+
+			create l_jsa_line.make (2)
+			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("Wheel"))
+			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("$20.50"))
+			j_array.add (l_jsa_line)
+
+			create l_jsa_line.make (2)
+			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("Door"))
+			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("$15"))
+			j_array.add (l_jsa_line)
+
+			create l_jsa_line.make (2)
+			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("Engine"))
+			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("$100"))
+			j_array.add (l_jsa_line)
+
+			create l_jsa_line.make (2)
+			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("Totals"))
+			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("$135.50"))
+			j_array.add (l_jsa_line)
+
+
+			l_res.put (j_array, "values")
+
+			Result := l_res.representation
+			logger.write_debug ("impl_append_body-> Result: '" + Result.out + "'")
 		end
 
 end
