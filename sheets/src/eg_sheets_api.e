@@ -123,11 +123,11 @@ feature -- Spreedsheets Operations
 			logger.write_information ("append-> spreadsheed_id:" + a_spreadsheet_id)
 			-- path params
 			l_path_params_s := a_spreadsheet_id
-			l_path_params_s.append ("/values/{") -- spreadsheets/{spreadsheetId}/values/{range}:append
+			l_path_params_s.append ("/values/") -- spreadsheets/{spreadsheetId}/values/{range}:append
 
 			l_path_params_s.append ("Sheet1!A:A") -- range ex. A1:B2 or namedRanges TRY: Sheet1!A:A | last not null index could be: =index(J:J,max(row(J:J)*(J:J<>"")))
 
-			l_path_params_s.append ("}:append")
+			l_path_params_s.append (":append")
 			-- qry params
 			create l_qry_params.make (2)
 			l_qry_params.extend ("RAW", "valueInputOption") -- INPUT_VALUE_OPTION_UNSPECIFIED|RAW|USER_ENTERED https://developers.google.com/sheets/api/reference/rest/v4/ValueInputOption
@@ -314,7 +314,7 @@ feature {NONE} -- Implementation
 				-- Create the access token that will identifies the user making the request.
 			create l_access_token.make_token_secret (access_token, "NOT_NEEDED")
 				--| Todo improve access_token to create a token without a secret.
-			if attached l_access_token as ll_access_token then
+			check attached l_access_token as ll_access_token then
 				logger.write_information ("internal_api_call->Got the Access Token:" + ll_access_token.token);
 
 					--Now let's go and check if the request is signed correcty
@@ -327,7 +327,13 @@ feature {NONE} -- Implementation
 				request.add_header ("Content-length", "0")
 				upload_data (a_method, request, a_upload_data)
 				add_parameters (a_method, request, a_params)
+
 				api_service.sign_request (ll_access_token, request)
+
+				logger.write_debug ("internal_api_call->uri:'" + request.uri + "'")
+				if attached request.upload_file as l_s then
+					logger.write_debug ("internal_api_call->upload file:'" + l_s + "'")
+				end
 				if attached {OAUTH_RESPONSE} request.execute as l_response then
 					last_response := l_response
 				end
@@ -433,9 +439,10 @@ feature {NONE} -- Implementation
 			l_raw_file: RAW_FILE
 		do
 			if a_method.is_case_insensitive_equal_general ("POST") and then attached a_upload_data as l_upload_data then
-
 				create l_raw_file.make_open_read (l_upload_data.file_name.absolute_path.name)
 				if l_raw_file.exists then
+					logger.write_debug ("upload_data-> Content-type: '" + l_upload_data.content_type + "'")
+					logger.write_debug ("upload_data-> upload file name: '" + l_upload_data.file_name.absolute_path.name + "'")
 					request.add_header ("Content-Type", l_upload_data.content_type)
 					request.set_upload_filename (l_upload_data.file_name.absolute_path.name)
 					request.add_form_parameter("source", l_upload_data.file_name.name.as_string_32)
@@ -472,14 +479,14 @@ feature {NONE} -- Implementation
 			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("second_cell line 1"))
 			l_jsa_main.extend (l_jsa_line)
 
-			l_res.put (l_jsa_line, "values")
+			l_res.put (l_jsa_main, "values")
 
 
 			create data_file.make_open_temporary
 			check
 				attached data_file as l_df
 			then
-				l_df.put_string (l_jsa_main.representation)
+				l_df.put_string (l_res.representation)
 				Result := [l_df.path, "application/json"]
 			end
 
