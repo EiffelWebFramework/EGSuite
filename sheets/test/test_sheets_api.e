@@ -18,11 +18,12 @@ feature -- {NONE}
 	make
 		do
 			logger.write_information ("make-> ======================> Starting application")
-			set_from_json_credentials_file_path (create {PATH}.make_from_string ("/home/pg/tmp/eg-sheets/eg-sheets_credentials_eg-suite-desktop-api.json"))
+			set_from_json_credentials_file_path (create {PATH}.make_from_string ("/home/pg/tmp/eg-sheets/EGSheets-itadmin-api-project-credentials.json"))
 			retrieve_access_token
 --			test_create_sheet
 --			test_get_sheet ("1v1N4nRa6mmLcP9rUuyQPiCnLuUcBQFDEC7E0CDg3ASI")
-			test_append_sheet ("1v1N4nRa6mmLcP9rUuyQPiCnLuUcBQFDEC7E0CDg3ASI")
+			test_append_sheet ("19cKCmQBWJoMePX0Iy6LueHRw0sS2bMcyP1Auzbkvj6M") --pg
+			--test_append_sheet ("1j5CTkpgOc6Y5qgYdA_klZYjNhmN2KYocoZAdM4Y61tw") --jv
 		end
 
 
