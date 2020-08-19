@@ -1,6 +1,6 @@
 note
 	description: "[
-		Object representing an SpreedSheet Resource
+		Object representing an SpreadSheet Resource
 		
 		{
 		  "spreadsheetId": string,
@@ -30,7 +30,7 @@ note
 	EIS: "name=Resource that represents a spreadsheet.", "src=https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets#Spreadsheet", "protocol=uri"
 
 class
-	EG_SPREEDSHEET
+	EG_SPREADSHEET
 
 inherit
 	ANY
@@ -76,6 +76,15 @@ feature -- Access
 	developer_metadata: LIST [EG_DEVELOPER_METADATA]
 			-- The developer metadata associated with a spreadsheet.
 
+
+feature -- Status Report
+
+	is_id_set: BOOLEAN
+			-- Has the id been setted?
+
+	is_url_set: BOOLEAN
+			-- Has the url been setted?		
+
 feature -- Change Element
 
 	set_protperty (a_properties: like properties)
@@ -92,10 +101,24 @@ feature -- Change Element
 			sheets.force (a_sheet)
 		end
 
+	set_sheets (a_sheets: like sheets)
+		do
+			sheets := a_sheets
+		ensure
+			sheets_set: sheets = a_sheets
+		end
+
 	force_name_range (a_range: EG_NAMED_RANGE)
 			-- Add a range `a_range` to the list of ranges.
 		do
 			named_ranges.force (a_range)
+		end
+
+	set_named_ranges (a_named_ranges: like named_ranges)
+		do
+			named_ranges := a_named_ranges
+		ensure
+			named_ranges_set: named_ranges = a_named_ranges
 		end
 
 	force_developer_metadata (a_metadata: EG_DEVELOPER_METADATA)
@@ -104,17 +127,36 @@ feature -- Change Element
 			developer_metadata.force (a_metadata)
 		end
 
+	set_developer_metadata (a_metadata: like developer_metadata)
+		do
+			developer_metadata := a_metadata
+		ensure
+			developer_metadata_set: developer_metadata = a_metadata
+		end
+
 feature {EG_SHEETS_JSON} -- Factory
 
 	set_id (a_id: STRING)
 			-- Set id with `a_id`.
+		require
+			no_id_set: not is_id_set
 		do
+			is_id_set := True
 			create id.make_from_string (a_id)
+		ensure
+			is_id_set: is_id_set
+			id_set: id.is_case_insensitive_equal (a_id)
 		end
 
 	set_url (a_url: STRING)
 			-- Set url with `a_url`
+		require
+			not_url_set: not is_url_set
 		do
+			is_url_set := True
 			create url.make_from_string (a_url)
+		ensure
+			url_set: url.is_case_insensitive_equal (a_url)
+			is_url_set: is_url_set
 		end
 end

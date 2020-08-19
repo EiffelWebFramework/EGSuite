@@ -23,7 +23,7 @@ feature -- Status Report
 
 feature -- Post
 
-	create_spreedsheet: EG_SPREEDSHEET
+	create_spreedsheet: EG_SPREADSHEET
 			-- Creates a spreadsheet, returning the newly created spreadsheet.
 		note
 			EIS:"name=create.spreedsheets", "src=https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/create", "protocol=uri"

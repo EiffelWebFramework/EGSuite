@@ -15,7 +15,6 @@ create
 
 feature {NONE} -- Initialization
 
-
 	make (a_code: READABLE_STRING_32)
 		do
 			create eg_sheets_api.make (a_code)
@@ -31,21 +30,19 @@ feature -- Access
 			end
 		end
 
-
-
 feature -- Post
 
-	create_spreedsheet: EG_SPREEDSHEET
+	create_spreedsheet: EG_SPREADSHEET
 			-- Creates a spreadsheet, returning the newly created spreadsheet.
 		note
-			EIS:"name=create.spreedsheets", "src=https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/create", "protocol=uri"
+			EIS: "name=create.spreedsheets", "src=https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/create", "protocol=uri"
 		do
 			create Result
-			if attached eg_sheets_api.create_spreedsheet  as s then
+			if attached eg_sheets_api.create_spreedsheet as s then
 				if attached parsed_json (s) as j then
 					Result := eg_spreadsheet (Void, j)
 				else
-					-- set error
+						-- set error
 				end
 			end
 		end
@@ -58,8 +55,8 @@ feature -- Error
 
 feature -- Implementation Factory
 
-	eg_spreadsheet (a_spreadsheet: detachable like eg_spreadsheet; a_json: JSON_VALUE): EG_SPREEDSHEET
-			--
+	eg_spreadsheet (a_spreadsheet: detachable like eg_spreadsheet; a_json: JSON_VALUE): EG_SPREADSHEET
+			-- Create an object `EG_SPREADSHEET`
 		do
 			if a_spreadsheet /= Void then
 				Result := a_spreadsheet
@@ -72,54 +69,54 @@ feature -- Implementation Factory
 			if attached string_value_from_json (a_json, "spreadsheetUrl") as l_url then
 				Result.set_url (l_url)
 			end
-			Result.set_protperty (eg_spreadsheet_properties (a_json))
+			if attached {JSON_OBJECT} json_value (a_json, "properties") as l_properties then
+				Result.set_protperty (eg_spreadsheet_properties (l_properties))
+			end
 			if attached {JSON_ARRAY} json_value (a_json, "sheets") as l_sheets then
 				across l_sheets as ic loop
+					Result.force_sheet (eg_sheets (ic.item))
 				end
 			end
 			if attached {JSON_ARRAY} json_value (a_json, "namedRanges") as l_named_ranges then
 			end
 			if attached {JSON_ARRAY} json_value (a_json, "developerMetadata") as l_developer_metadata then
-				-- TODO
+					-- TODO
 			end
-
 
 		end
 
 feature {NONE} -- JSON To Eiffel
 
 	eg_spreadsheet_properties (a_json: JSON_VALUE): EG_SPREADSHEET_PROPERTIES
-			--
+			-- Create an object `EG_SPREADSHEET_PROPERTIES` from a json representation `a_json`.
 		local
 			l_cell_format: EG_CELL_FORMAT
 		do
 			create Result
-			if attached {JSON_OBJECT} json_value (a_json, "properties") as l_properties then
-				if attached string_value_from_json (l_properties, "title") as l_title then
-					Result.set_title (l_title)
+			if attached string_value_from_json (a_json, "title") as l_title then
+				Result.set_title (l_title)
+			end
+			if attached string_value_from_json (a_json, "locale") as l_locale then
+				Result.set_locale (l_locale)
+			end
+			if attached string_value_from_json (a_json, "autoRecalc") as l_auto_recalc then
+				if l_auto_recalc.is_case_insensitive_equal ("ON_CHANGE") then
+					Result.auto_recalc.set_on_change
+				elseif l_auto_recalc.is_case_insensitive_equal ("MINUTE") then
+					Result.auto_recalc.set_minute
+				elseif l_auto_recalc.is_case_insensitive_equal ("HOUR") then
+					Result.auto_recalc.set_hour
 				end
-				if attached string_value_from_json (l_properties, "locale") as l_locale then
-					Result.set_locale (l_locale)
-				end
-				if attached string_value_from_json (l_properties, "autoRecalc") as l_auto_recalc then
-					if l_auto_recalc.is_case_insensitive_equal ("ON_CHANGE") then
-						Result.auto_recalc.set_on_change
-					elseif l_auto_recalc.is_case_insensitive_equal ("MINUTE") then
-						Result.auto_recalc.set_minute
-					elseif l_auto_recalc.is_case_insensitive_equal ("HOUR") then
-						Result.auto_recalc.set_hour
-					end
-				end
-				if attached string_value_from_json (l_properties, "timeZone") as l_time_zone then
-					Result.set_time_zone (l_time_zone)
-				end
-				if attached {JSON_OBJECT} json_value (l_properties, "defaultFormat") as l_default_format then
-				end
+			end
+			if attached string_value_from_json (a_json, "timeZone") as l_time_zone then
+				Result.set_time_zone (l_time_zone)
+			end
+			if attached {JSON_OBJECT} json_value (a_json, "defaultFormat") as l_default_format then
 			end
 		end
 
-
-	default_format (a_json: JSON_OBJECT): EG_CELL_FORMAT
+	cell_format (a_json: JSON_OBJECT): EG_CELL_FORMAT
+			-- Create an object `EG_CELL_FORMAT` from a json representation `a_json`
 		do
 			create Result
 
@@ -130,23 +127,23 @@ feature {NONE} -- JSON To Eiffel
 				Result.set_padding (padding (l_padding))
 			end
 			if attached string_value_from_json (a_json, "verticalAlignment") as l_alignment then
-				if l_alignment.is_case_insensitive_equal ("BOTTOM")  then
+				if l_alignment.is_case_insensitive_equal ("BOTTOM") then
 					Result.vertical_alignment.set_bottom
-				elseif l_alignment.is_case_insensitive_equal ("MIDDLE")  then
+				elseif l_alignment.is_case_insensitive_equal ("MIDDLE") then
 					Result.vertical_alignment.set_middle
-				elseif l_alignment.is_case_insensitive_equal ("TOP")  then
+				elseif l_alignment.is_case_insensitive_equal ("TOP") then
 					Result.vertical_alignment.set_top
 				end
 			end
 			if attached string_value_from_json (a_json, "wrapStrategy") as l_wrap_strategy then
-				if l_wrap_strategy.is_case_insensitive_equal ("OVERFLOW_CELL")  then
+				if l_wrap_strategy.is_case_insensitive_equal ("OVERFLOW_CELL") then
 					Result.wrap_strategy.set_overflow_cell
 				end
-				if l_wrap_strategy.is_case_insensitive_equal ("LEGACY_WRAP")  then
+				if l_wrap_strategy.is_case_insensitive_equal ("LEGACY_WRAP") then
 					Result.wrap_strategy.set_legacy_wrap
-				elseif l_wrap_strategy.is_case_insensitive_equal ("CLIP")  then
+				elseif l_wrap_strategy.is_case_insensitive_equal ("CLIP") then
 					Result.wrap_strategy.set_clip
-				elseif l_wrap_strategy.is_case_insensitive_equal ("WRAP")  then
+				elseif l_wrap_strategy.is_case_insensitive_equal ("WRAP") then
 					Result.wrap_strategy.set_wrap
 				end
 			end
@@ -159,6 +156,7 @@ feature {NONE} -- JSON To Eiffel
 		end
 
 	eg_color (a_json: JSON_OBJECT): EG_COLOR
+			-- Create an object `EG_COLOR` from a json rerpesentation `a_json`.
 		do
 			create Result
 			if attached integer_value_from_json (a_json, "red") as l_val then
@@ -184,6 +182,7 @@ feature {NONE} -- JSON To Eiffel
 		end
 
 	padding (a_json: JSON_OBJECT): EG_PADDING
+			-- Create an object `EG_PADDING` from a json representation `a_json`.
 		do
 			create Result
 			if attached integer_value_from_json (a_json, "top") as l_val then
@@ -201,6 +200,7 @@ feature {NONE} -- JSON To Eiffel
 		end
 
 	text_format (a_json: JSON_OBJECT): EG_TEXT_FORMAT
+			-- Create an object `EG_TEXT_FORMAT` from a json representation `a_json`.
 		do
 			create Result
 			if attached {JSON_OBJECT} json_value (a_json, "foregroundColor") as l_foreground_color then
@@ -230,6 +230,7 @@ feature {NONE} -- JSON To Eiffel
 		end
 
 	eg_color_style (a_json: JSON_OBJECT): EG_COLOR_STYLE
+			-- Create an object `EG_COLOR_STYLE` from a json representation `a_json`.
 		local
 			l_tc: EG_THEME_COLOR
 		do
@@ -240,23 +241,23 @@ feature {NONE} -- JSON To Eiffel
 				attached string_value_from_json (a_json, "themeColor") as l_theme_color
 			then
 				create l_tc
-				if l_theme_color.is_case_insensitive_equal ("TEXT")  then
+				if l_theme_color.is_case_insensitive_equal ("TEXT") then
 					l_tc.set_text
-				elseif l_theme_color.is_case_insensitive_equal ("BACKGROUND")  then
+				elseif l_theme_color.is_case_insensitive_equal ("BACKGROUND") then
 					l_tc.set_background
-				elseif l_theme_color.is_case_insensitive_equal ("ACCENT1")  then
+				elseif l_theme_color.is_case_insensitive_equal ("ACCENT1") then
 					l_tc.set_accent1
-				elseif l_theme_color.is_case_insensitive_equal ("ACCENT2")  then
+				elseif l_theme_color.is_case_insensitive_equal ("ACCENT2") then
 					l_tc.set_accent2
-				elseif l_theme_color.is_case_insensitive_equal ("ACCENT3")  then
+				elseif l_theme_color.is_case_insensitive_equal ("ACCENT3") then
 					l_tc.set_accent3
-				elseif l_theme_color.is_case_insensitive_equal ("ACCENT4")  then
+				elseif l_theme_color.is_case_insensitive_equal ("ACCENT4") then
 					l_tc.set_accent4
-				elseif l_theme_color.is_case_insensitive_equal ("ACCENT5")  then
+				elseif l_theme_color.is_case_insensitive_equal ("ACCENT5") then
 					l_tc.set_accent5
-				elseif l_theme_color.is_case_insensitive_equal ("ACCENT6")  then
+				elseif l_theme_color.is_case_insensitive_equal ("ACCENT6") then
 					l_tc.set_accent6
-				elseif l_theme_color.is_case_insensitive_equal ("LINK")  then
+				elseif l_theme_color.is_case_insensitive_equal ("LINK") then
 					l_tc.set_link
 				end
 				Result.set_theme_color (l_tc)
@@ -264,10 +265,91 @@ feature {NONE} -- JSON To Eiffel
 		end
 
 	eg_sheets (a_json: JSON_VALUE): EG_SHEET
+			-- Create an object `EG_SHEET` from a json representation `a_json`.
 		do
 			create Result
+			if attached {JSON_OBJECT} json_value (a_json, "properties") as l_properties then
+				Result.set_properties (sheet_properties (l_properties))
+			end
+			if attached {JSON_ARRAY} json_value (a_json, "data") as l_data then
+					-- TODO
+			end
+			if attached {JSON_ARRAY} json_value (a_json, "merges") as l_merges then
+					-- TODO
+			end
+			if attached {JSON_ARRAY} json_value (a_json, "conditionalFormats") as l_conditional_formats then
+					-- TODO
+			end
+			if attached {JSON_ARRAY} json_value (a_json, "filterViews") as l_filter_views then
+					-- TODO
+			end
+			if attached {JSON_ARRAY} json_value (a_json, "protectedRanges") as l_protected_ranges then
+					-- TODO
+			end
+			if attached {JSON_OBJECT} json_value (a_json, "basicFilter") as l_basic_filter then
+					-- TODO
+			end
+			if attached {JSON_ARRAY} json_value (a_json, "charts") as l_charts then
+					-- TODO
+			end
+			if attached {JSON_ARRAY} json_value (a_json, "bandedRanges") as l_banded_ranges then
+					-- TODO
+			end
+			if attached {JSON_ARRAY} json_value (a_json, "developerMetadata") as l_developer_metadata then
+					-- TODO
+			end
+			if attached {JSON_ARRAY} json_value (a_json, "rowGroups") as l_row_groups then
+					-- TODO
+			end
+			if attached {JSON_ARRAY} json_value (a_json, "columnGroups") as l_column_groups then
+					-- TODO
+			end
+			if attached {JSON_ARRAY} json_value (a_json, "slicers") as l_slicers then
+					-- TODO
+			end
 		end
 
+	sheet_properties (a_json: JSON_VALUE): EG_SHEET_PROPERTIES
+			-- Create an object `EG_SHEET_PROPERTIES` from a json representation `a_json`.
+		do
+			create Result
+			if attached integer_value_from_json (a_json, "sheetId") as l_sheetId then
+				Result.set_sheet_id (l_sheetId)
+			end
+			if attached string_value_from_json (a_json, "title") as l_title then
+				Result.set_title (l_title)
+			end
+			if attached integer_value_from_json (a_json, "index") as l_index then
+				Result.set_index (l_index)
+			end
+			if attached string_value_from_json (a_json, "sheetType") as l_sheet_type then
+				if l_sheet_type.is_case_insensitive_equal ("GRID") then
+					Result.sheet_type.set_grid
+				elseif l_sheet_type.is_case_insensitive_equal ("OBJECT") then
+					Result.sheet_type.set_grid
+				end
+			end
+			if attached {JSON_OBJECT} json_value (a_json, "gridProperties") as l_grid_properties then
+				if attached integer_value_from_json (l_grid_properties, "rowCount") as l_row_count then
+					Result.grid_properties.set_row_count (l_row_count)
+				end
+				if attached integer_value_from_json (l_grid_properties, "columnCount") as l_column_count then
+					Result.grid_properties.set_column_count (l_column_count)
+				end
+			end
+			if attached boolean_value_from_json (a_json, "hidden") as l_hidden then
+				Result.set_hidden (l_hidden)
+			end
+			if attached {JSON_OBJECT} json_value (a_json, "tabColor") as l_color then
+				Result.set_tab_color (eg_color (l_color))
+			end
+			if attached {JSON_OBJECT} json_value (a_json, "tabColorStyle") as l_color_style then
+				Result.set_tab_color_style (eg_color_style (l_color_style))
+			end
+			if attached boolean_value_from_json (a_json, "rightToLeft") as l_rtl then
+				Result.set_right_to_left (l_rtl)
+			end
+		end
 
 feature {NONE} -- Implementation
 
@@ -321,7 +403,7 @@ feature {NONE} -- Implementation
 			obj: HASH_TABLE [JSON_VALUE, JSON_STRING]
 		do
 			if attached {JSON_OBJECT} a_json_data as v_data then
-				obj	:= v_data.map_representation
+				obj := v_data.map_representation
 				from
 					obj.start
 				until

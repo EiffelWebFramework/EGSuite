@@ -337,7 +337,7 @@ feature {NONE} -- Implementation
 					request.add_header ("Content-Type", "application/json; charset=UTF-8")
 					request.add_payload (a_payload)
 				else
-					request.add_header ("Content-length", "")
+					request.add_header ("Content-length", "0")
 				end
 
 				api_service.sign_request (ll_access_token, request)

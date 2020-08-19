@@ -2,8 +2,6 @@ note
 	description: "[
 		A sheet in a spreadsheet.
 
-
-
 		  "properties": {
 		    object (SheetProperties)
 		  },
@@ -158,6 +156,13 @@ feature -- Element Change
 			data := l_data
 		end
 
+	set_data (a_data: like data)
+		do
+			data := a_data
+		ensure
+			data_set: data = a_data
+		end
+
 	force_merges (a_merge: EG_GRID_RANGE)
 			-- Add an item `a_merge` to the list `merges`.
 		local
@@ -171,6 +176,13 @@ feature -- Element Change
 				l_merges.force (a_merge)
 			end
 			merges := l_merges
+		end
+
+	set_merges (a_merges: like merges)
+		do
+			merges := a_merges
+		ensure
+			merges_set: merges = a_merges
 		end
 
 	force_conditional_formats (a_item: EG_CONDITIONAL_FORMAT_RULE)
@@ -188,6 +200,13 @@ feature -- Element Change
 			conditional_formats := l_conditional_formats
 		end
 
+	set_conditional_formats (a_conditional_formats: like conditional_formats)
+		do
+			conditional_formats := a_conditional_formats
+		ensure
+			conditional_formats_set: conditional_formats = a_conditional_formats
+		end
+
 	force_filter_views	(a_item: EG_FILTER_VIEW)
 			-- Add an item `a_item` to the list `fitler_views`.
 		local
@@ -203,6 +222,13 @@ feature -- Element Change
 			filter_views := l_filter_views
 		end
 
+	set_filter_views (a_filter_views: like filter_views)
+		do
+			filter_views := a_filter_views
+		ensure
+			filter_views_set: filter_views = a_filter_views
+		end
+
 	force_protected_ranges (a_item: EG_PROTECTED_RANGE)
 			-- Add an item `a_item` to the list `protected_ranges`.
 		local
@@ -216,6 +242,13 @@ feature -- Element Change
 				l_protected_ranges.force (a_item)
 			end
 			protected_ranges := l_protected_ranges
+		end
+
+	set_protected_ranges (a_protected_ranges: like protected_ranges)
+		do
+			protected_ranges := a_protected_ranges
+		ensure
+			protected_ranges_set: protected_ranges = a_protected_ranges
 		end
 
 	set_basic_filter (a_filter: like basic_filter)
@@ -241,6 +274,13 @@ feature -- Element Change
 			charts := l_charts
 		end
 
+	set_charts (a_charts: like charts)
+		do
+			charts := a_charts
+		ensure
+			charts_set: charts = a_charts
+		end
+
 	force_banded_ranges (a_item: EG_BANDED_RANGE)
 			-- Add an item `a_item` to the list of `banded_ranges`.
 		local
@@ -254,6 +294,13 @@ feature -- Element Change
 				l_banded_ranges.force (a_item)
 			end
 			banded_ranges := l_banded_ranges
+		end
+
+	set_banded_ranges (a_banded_ranges: like banded_ranges)
+		do
+			banded_ranges := a_banded_ranges
+		ensure
+			banded_ranges_set: banded_ranges = a_banded_ranges
 		end
 
 	force_developer_metadata (a_item: EG_DEVELOPER_METADATA)
@@ -271,6 +318,13 @@ feature -- Element Change
 			developer_metadata := l_developer_metadata
 		end
 
+	set_developer_metadata (a_developer_metadata: like developer_metadata)
+		do
+			developer_metadata := a_developer_metadata
+		ensure
+			developer_metadata_set: developer_metadata = a_developer_metadata
+		end
+
 	force_raw_groups (a_item: EG_DIMENSION_GROUP)
 			-- Add an item `a_item` to the list of `raw_groups`.
 		local
@@ -284,6 +338,13 @@ feature -- Element Change
 				l_raw_groups.force (a_item)
 			end
 			raw_groups := l_raw_groups
+		end
+
+	set_raw_groups (a_raw_groups: like raw_groups)
+		do
+			raw_groups := a_raw_groups
+		ensure
+			raw_groups_set: raw_groups = a_raw_groups
 		end
 
 	force_column_groups (a_item: EG_DIMENSION_GROUP)
@@ -301,6 +362,13 @@ feature -- Element Change
 			column_groups := l_column_groups
 		end
 
+	set_column_groups (a_column_groups: like column_groups)
+		do
+			column_groups := a_column_groups
+		ensure
+			column_groups_set: column_groups = a_column_groups
+		end
+
 	force_slicers (a_item: EG_SLICER)
 			-- -- Add an item `a_item` to the list of `slicers`.
 		local
@@ -314,6 +382,13 @@ feature -- Element Change
 				l_sclicers.force (a_item)
 			end
 			slicers := l_sclicers
+		end
+
+	set_slicers (a_slicers: like slicers)
+		do
+			slicers := a_slicers
+		ensure
+			slicers_set: slicers = a_slicers
 		end
 
 end
