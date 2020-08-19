@@ -304,6 +304,7 @@ feature {NONE} -- Implementation
 			logger.write_debug ("internal_api_call-> a_api_url:" + a_api_url + " method:" + a_method)
 				-- TODO improve this, so we can check the required scopes before we
 				-- do an api call.
+				-- TODO add a class with the valid scopes.
 			create config.make_default ("", "")
 			config.set_scope ("https://www.googleapis.com/auth/spreadsheets")
 
@@ -312,8 +313,8 @@ feature {NONE} -- Implementation
 			create api_service.make (create {OAUTH_20_GOOGLE_API}, config)
 				--| TODO improve cypress service creation procedure to make configuration optional.
 
-			print ("%N===Google  OAuth Workflow using OAuth access token for the owner of the application ===%N")
 				--| TODO rewrite prints as logs
+			logger.write_debug ("%N===Google  OAuth Workflow using OAuth access token for the owner of the application ===%N")
 
 				-- Create the access token that will identifies the user making the request.
 			create l_access_token.make_token_secret (access_token, "NOT_NEEDED")
@@ -343,7 +344,7 @@ feature {NONE} -- Implementation
 
 				logger.write_debug ("internal_api_call->uri:'" + request.uri + "'")
 				if attached request.upload_file as l_s then
-					logger.write_debug ("internal_api_call->upload file:'" + l_s + "'")
+					logger.write_debug ("internal_api_call->upload file:'" + l_s.out + "'")
 				end
 				if attached {OAUTH_RESPONSE} request.execute as l_response then
 					last_response := l_response
@@ -453,7 +454,7 @@ feature {NONE} -- Implementation
 				create l_raw_file.make_open_read (l_upload_data.file_name.absolute_path.name)
 				if l_raw_file.exists then
 					logger.write_debug ("upload_data-> Content-type: '" + l_upload_data.content_type + "'")
-					logger.write_debug ("upload_data-> upload file name: '" + l_upload_data.file_name.absolute_path.name + "'")
+					logger.write_debug ("upload_data-> upload file name: '" + l_upload_data.file_name.absolute_path.name.out + "'")
 					request.add_header ("Content-Type", l_upload_data.content_type)
 					request.set_upload_filename (l_upload_data.file_name.absolute_path.name)
 					request.add_form_parameter("source", l_upload_data.file_name.name.as_string_32)
