@@ -22,7 +22,7 @@ feature {NONE} -- Initialization
 			create last_token.make_empty
 			get_token
 			if last_token.token.is_empty then
-				logger.write_warning ("retrieve_access_token-> There is something wrong token is empty")
+				logger.write_warning ("retrieve_access_token-> There is something wrong token is empty from file_path: " + Token_file_path_s)
 				check
 					not_happening: False
 				end
@@ -39,7 +39,7 @@ feature {NONE} -- Initialization
 			l_date_now: DATE_TIME
 			l_diff:  INTEGER_64
 		do
-			create {PLAIN_TEXT_FILE} file.make_with_name ("token.access")
+			create {PLAIN_TEXT_FILE} file.make_with_name (Token_file_path_s)
 			if file.exists then
 				file.open_read
 				file.read_stream (file.count)
@@ -97,7 +97,7 @@ feature {NONE} -- Initialization
 				end
 
 				if attached api_service.access_token_post (empty_token, create {OAUTH_VERIFIER}.make (io.last_string)) as access_token then
-					create {PLAIN_TEXT_FILE} file.make_create_read_write ("token.access")
+					create {PLAIN_TEXT_FILE} file.make_create_read_write (Token_file_path_s)
 					file.put_string (serialize (access_token))
 					Result := access_token
 					file.flush
@@ -137,7 +137,7 @@ feature {NONE} -- Initialization
 				if attached request.execute as l_response then
 					if attached l_response.body as l_body then
 						if attached {OAUTH_TOKEN} google.access_token_extractor.extract (l_body) as l_access_token then
-							create {PLAIN_TEXT_FILE} file.make_create_read_write ("token.access")
+							create {PLAIN_TEXT_FILE} file.make_create_read_write (Token_file_path_s)
 							file.put_string (serialize (l_access_token))
 							Result := l_access_token
 							file.flush
@@ -147,6 +147,10 @@ feature {NONE} -- Initialization
 				end
 			end
 		end
+
+feature -- Access
+
+	Token_file_path_s: STRING = "token.access"
 
 feature -- Status Setting
 

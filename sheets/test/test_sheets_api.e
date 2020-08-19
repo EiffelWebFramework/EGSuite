@@ -18,9 +18,18 @@ feature -- {NONE}
 	make
 		do
 			logger.write_information ("make-> ======================> Starting application")
+
+			set_from_json_credentials_file_path (create {PATH}.make_from_string ("/home/pg/tmp/eg-sheets/EGSheets-itadmin-api-project-credentials.json"))
+			retrieve_access_token
+--			test_create_sheet
+--			test_get_sheet ("1v1N4nRa6mmLcP9rUuyQPiCnLuUcBQFDEC7E0CDg3ASI")
+			test_append_sheet ("19cKCmQBWJoMePX0Iy6LueHRw0sS2bMcyP1Auzbkvj6M") --pg
+			--test_append_sheet ("1j5CTkpgOc6Y5qgYdA_klZYjNhmN2KYocoZAdM4Y61tw") --jv
+
 			set_from_json_credentials_file_path (create {PATH}.make_from_string (CREDENTIALS_PATH))
 			retrieve_access_token
 			test_get_sheet ("1v1N4nRa6mmLcP9rUuyQPiCnLuUcBQFDEC7E0CDg3ASI")
+
 		end
 
 
@@ -86,7 +95,46 @@ feature -- Tests
 					check  Json_Field_spreadsheetUrl: l_spreedsheet_get_result.has_substring ("spreadsheetUrl") end
 						-- developerMetadata and namedRanges are optional.
 --					debug ("test_create_sheet")
-						print ("test_get_sheet-> success. Result:%N")
+						logger.write_debug ("test_get_sheet-> success. Result:%N")
+						logger.write_debug (l_spreedsheet_get_result + "%N")
+						logger.write_debug ("test_get_sheet-> success. ")
+--					end
+				end
+			else
+					-- Bad scope. no connection, etc
+				check Unexptected_Behavior: False end
+			end
+		end
+
+	test_append_sheet (an_id: attached like {EG_SHEETS_API}.spreadsheet_id)
+		local
+			l_esapi: EG_SHEETS_API
+			l_data: ARRAY[ARRAY[STRING]]
+		do
+			l_data := <<
+					<<"test1", "test2">>,
+					<<"test3", "test4">>
+				>>
+			create l_esapi.make (last_token.token)
+			if attached l_esapi.append_with_id (an_id, l_data) as l_spreedsheet_get_result then
+				if l_esapi.has_error then
+--					debug ("test_create_sheet")
+						print ("test_append_sheet-> Error   %N" )
+						print ("test_append_sheet-> Error: msg:" + l_esapi.error_message)
+						print ("test_append_sheet-> See codes here: https://developers.google.com/maps-booking/reference/rest-api-v3/status_codes")
+						print ("%N")
+--					end
+					check
+						cannot_create_the_spreedsheet: False
+					end
+				else
+					check  Json_Field_spreadsheetId: l_spreedsheet_get_result.has_substring ("spreadsheetId") end
+					check  Json_Field_properties: l_spreedsheet_get_result.has_substring ("properties") end
+					check  Json_Field_sheets: l_spreedsheet_get_result.has_substring ("sheets") end
+					check  Json_Field_spreadsheetUrl: l_spreedsheet_get_result.has_substring ("spreadsheetUrl") end
+						-- developerMetadata and namedRanges are optional.
+--					debug ("test_create_sheet")
+						print ("test_append_sheet-> success. Result:%N")
 						print (l_spreedsheet_get_result + "%N")
 --					end
 				end
