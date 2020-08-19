@@ -74,13 +74,18 @@ feature -- Implementation Factory
 			end
 			if attached {JSON_ARRAY} json_value (a_json, "sheets") as l_sheets then
 				across l_sheets as ic loop
-					Result.force_sheet (eg_sheets (ic.item))
+					Result.force_sheet (eg_sheet (ic.item))
 				end
 			end
 			if attached {JSON_ARRAY} json_value (a_json, "namedRanges") as l_named_ranges then
+				across l_named_ranges as ic loop
+					Result.force_name_range (eg_named_ranges (ic.item))
+				end
 			end
 			if attached {JSON_ARRAY} json_value (a_json, "developerMetadata") as l_developer_metadata then
-					-- TODO
+				across l_developer_metadata as ic loop
+					Result.force_developer_metadata (eg_developer_metadata (l_developer_metadata))
+				end
 			end
 
 		end
@@ -264,7 +269,7 @@ feature {NONE} -- JSON To Eiffel
 			end
 		end
 
-	eg_sheets (a_json: JSON_VALUE): EG_SHEET
+	eg_sheet (a_json: JSON_VALUE): EG_SHEET
 			-- Create an object `EG_SHEET` from a json representation `a_json`.
 		do
 			create Result
@@ -309,6 +314,21 @@ feature {NONE} -- JSON To Eiffel
 			end
 		end
 
+	eg_named_ranges (a_json: JSON_VALUE): EG_NAMED_RANGE
+			-- Create an object `EG_NAMED_RANGE` from a json representation.
+		do
+			create Result
+			if attached string_value_from_json (a_json, "namedRangeId") as l_named_range then
+				Result.set_name_range (l_named_range)
+			end
+			if attached string_value_from_json (a_json, "name") as l_named then
+				Result.set_name (l_named)
+			end
+			if attached {JSON_OBJECT} json_value (a_json, "range") as l_range  then
+				Result.set_range (eg_grid_range (l_range))
+			end
+		end
+
 	sheet_properties (a_json: JSON_VALUE): EG_SHEET_PROPERTIES
 			-- Create an object `EG_SHEET_PROPERTIES` from a json representation `a_json`.
 		do
@@ -349,6 +369,59 @@ feature {NONE} -- JSON To Eiffel
 			if attached boolean_value_from_json (a_json, "rightToLeft") as l_rtl then
 				Result.set_right_to_left (l_rtl)
 			end
+		end
+
+	eg_grid_range (a_json: JSON_VALUE): EG_GRID_RANGE
+			-- Create an object `EG_GRID_RANGE` from a json representation `a_json`.
+		do
+			create Result
+			if attached integer_value_from_json (a_json, "sheetId") as l_sheet_id then
+				Result.set_sheet_id (l_sheet_id)
+			end
+			if attached integer_value_from_json (a_json, "startRowIndex") as l_start_row_index then
+				Result.set_start_row_index (l_start_row_index)
+			end
+			if attached integer_value_from_json (a_json, "endRowIndex") as l_end_row_index then
+				Result.set_end_row_index (l_end_row_index)
+			end
+			if attached integer_value_from_json (a_json, "startColumnIndex") as l_start_column_index then
+				Result.set_start_column_index (l_start_column_index)
+			end
+			if attached integer_value_from_json (a_json, "endColumnIndex") as l_end_column_index then
+				Result.set_end_column_index (l_end_column_index)
+			end
+		end
+
+	eg_developer_metadata (a_json: JSON_VALUE): EG_DEVELOPER_METADATA
+			-- Create an object `EG_DEVELOPER_METADATA` from a json representation `a_json`.
+		do
+			create Result
+			if attached integer_value_from_json (a_json, "metadataId") as l_metadata_id then
+				Result.set_metadata_id (l_metadata_id)
+			end
+			if attached string_value_from_json (a_json, "metadataKey") as l_metadata_key then
+				Result.set_metadata_key (l_metadata_key)
+			end
+			if attached string_value_from_json (a_json, "metadataValue") as l_metadata_value then
+				Result.set_metadata_value (l_metadata_value)
+			end
+			if attached {JSON_OBJECT} json_value (a_json, "location") as l_location then
+				Result.set_location (developer_metadata_location (l_location))
+			end
+			if attached string_value_from_json (a_json, "visibility") as l_visibility then
+				if l_visibility.is_case_insensitive_equal ("DOCUMENT") then
+					Result.visibility.set_document
+				elseif l_visibility.is_case_insensitive_equal ("PROJECT") then
+					Result.visibility.set_project
+				end
+			end
+		end
+
+
+	developer_metadata_location (a_json: JSON_VALUE): EG_DEVELOPER_METADATA_LOCATION
+		do
+			create Result
+			-- TOSO
 		end
 
 feature {NONE} -- Implementation
