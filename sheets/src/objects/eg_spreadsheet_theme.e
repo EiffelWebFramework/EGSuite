@@ -59,4 +59,15 @@ feature -- Change Element
 		do
 			theme_colors.force (a_color)
 		end
+
+
+feature -- Eiffel to JSON
+
+	to_json: JSON_OBJECT
+			-- Json representation of current object
+		do
+			create Result.make_with_capacity (1)
+			Result.put (create {JSON_STRING}.make_from_string (primary_font_family), "primaryFontFamily")
+			-- theme_colors JSON_ARRAY
+		end
 end

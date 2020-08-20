@@ -1,5 +1,14 @@
 note
-	description: "Settings to control how circular dependencies are resolved with iterative calculation."
+	description: "[
+	Settings to control how circular dependencies are resolved with iterative calculation.
+	
+	JSON Representation
+	{
+	  "maxIterations": integer,
+	  "convergenceThreshold": number
+	}
+
+	]"
 	date: "$Date$"
 	revision: "$Revision$"
 	EIS: "name=Iteratice calculation settings", "src=https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets#iterativecalculationsettings", "protocol=uri"
@@ -33,5 +42,16 @@ feature -- Change Element
 		ensure
 			convergence_threshold_set: convergence_threshold = a_val
 		end
+
+
+feature -- Eiffel to JSON
+
+	to_json: JSON_OBJECT
+		do
+			create Result.make_with_capacity (2)
+			Result.put (create {JSON_NUMBER}.make_integer (max_iterations), "maxIterations")
+			Result.put (create {JSON_NUMBER}.make_integer (convergence_threshold), "convergenceThreshold")
+		end
+
 end
 

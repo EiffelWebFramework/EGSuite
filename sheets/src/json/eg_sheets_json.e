@@ -56,7 +56,7 @@ feature -- Error
 feature -- Implementation Factory
 
 	eg_spreadsheet (a_spreadsheet: detachable like eg_spreadsheet; a_json: JSON_VALUE): EG_SPREADSHEET
-			-- Create an object `EG_SPREADSHEET`
+			-- Create an object `EG_SPREADSHEET` from a representation `a_json`.
 		do
 			if a_spreadsheet /= Void then
 				Result := a_spreadsheet

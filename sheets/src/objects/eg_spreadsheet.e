@@ -159,4 +159,23 @@ feature {EG_SHEETS_JSON} -- Factory
 			url_set: url.is_case_insensitive_equal (a_url)
 			is_url_set: is_url_set
 		end
+
+feature -- Eiffel to JSON
+
+	to_json: JSON_OBJECT
+			-- Json representation of the Current object.
+		do
+			create Result.make_with_capacity (2)
+			Result.put (create {JSON_STRING}.make_from_string (id), "spreadsheetId")
+			Result.put (properties.to_json, "properties")
+			-- properties JSON_OBJECT
+			-- sheets JSON_ARRAY
+			-- namedRanges : JSON_ARRAY
+			Result.put (create {JSON_STRING}.make_from_string (url), "spreadsheetUrl")
+			-- developerMetadata JSON_ARRAY
+		end
+
+
+
+
 end
