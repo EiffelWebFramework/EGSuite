@@ -192,8 +192,11 @@ feature -- Eiffel to JSON
 		do
 			create Result.make_empty
 				-- TODO
-			Result.put (Void, "numberFormat")
+			if attached number_format as l_number_format then
+				Result.put (l_number_format.to_json, "numberFormat")
+			end
 			Result.put (background_color.to_json, "backgroundColor")
 			Result.put (background_color_style.to_json, "backgroundColorStyle")
+
 		end
 end
