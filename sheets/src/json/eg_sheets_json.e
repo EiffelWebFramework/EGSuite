@@ -412,6 +412,8 @@ feature {NONE} -- JSON To Eiffel
 
 	eg_developer_metadata (a_json: JSON_VALUE): EG_DEVELOPER_METADATA
 			-- Create an object `EG_DEVELOPER_METADATA` from a json representation `a_json`.
+		local
+			l_vs: EG_DEVELOPER_METADATA_VISIBILITY
 		do
 			create Result
 			if attached integer_value_from_json (a_json, "metadataId") as l_metadata_id then
@@ -427,11 +429,13 @@ feature {NONE} -- JSON To Eiffel
 				Result.set_location (developer_metadata_location (l_location))
 			end
 			if attached string_value_from_json (a_json, "visibility") as l_visibility then
+				create l_vs
 				if l_visibility.is_case_insensitive_equal ("DOCUMENT") then
-					Result.visibility.set_document
+					l_vs.set_document
 				elseif l_visibility.is_case_insensitive_equal ("PROJECT") then
-					Result.visibility.set_project
+					l_vs.set_project
 				end
+				Result.set_visibility (l_vs)
 			end
 		end
 

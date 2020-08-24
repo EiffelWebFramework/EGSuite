@@ -24,40 +24,22 @@ note
 class
 	EG_DEVELOPER_METADATA
 
-inherit
-	ANY
-		redefine
-			default_create
-		end
-
-create
-	default_create
-
-feature {NONE} -- Initialize
-
-	default_create
-		do
-			create metadata_key.make_empty
-			create metadata_value.make_empty
-			create location
-			create visibility
-		end
 
 feature -- Access
 
 	metadata_id: INTEGER
 		-- The spreadsheet-scoped unique ID that identifies the metadata. IDs may be specified when metadata is created, otherwise one will be randomly generated and assigned. Must be positive.
 
-	metadata_key: STRING
+	metadata_key: detachable STRING
 		-- The metadata key. There may be multiple metadata in a spreadsheet with the same key. Developer metadata must always have a key specified.
 
-	metadata_value: STRING
+	metadata_value: detachable STRING
 		-- Data associated with the metadata's key.
 
-	location: EG_DEVELOPER_METADATA_LOCATION
+	location: detachable EG_DEVELOPER_METADATA_LOCATION
 		-- The location where the metadata is associated.
 
-	visibility: EG_DEVELOPER_METADATA_VISIBILITY
+	visibility: detachable EG_DEVELOPER_METADATA_VISIBILITY
 		-- The metadata visibility. Developer metadata must always have a visibility specified.
 
 
@@ -102,9 +84,22 @@ feature -- Element Change
 feature -- Eiffel to JSON
 
 	to_json: JSON_OBJECT
+			-- JSON representation of the current object
 		do
 			create Result.make_empty
-			-- TODO
+			Result.put (create {JSON_NUMBER}.make_integer (metadata_id), "metadataId")
+			if attached metadata_key as l_metadata_key then
+				Result.put (create {JSON_STRING}.make_from_string (l_metadata_key), "metadataKey")
+			end
+			if attached metadata_value as l_mv then
+				Result.put (create {JSON_STRING}.make_from_string (l_mv), "metadataValue")
+			end
+			if attached location as l_location then
+				Result.put (l_location.to_json, "location")
+			end
+			if attached visibility as l_visibility then
+				Result.put (l_visibility.to_json, "visibility")
+			end
 		end
 
 end

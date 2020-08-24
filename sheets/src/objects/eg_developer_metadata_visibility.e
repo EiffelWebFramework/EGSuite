@@ -6,7 +6,7 @@ note
 		DEVELOPER_METADATA_VISIBILITY_UNSPECIFIED 	Default value.
 		DOCUMENT 									Document-visible metadata is accessible from any developer project with access to the document.
 		PROJECT 									Project-visible metadata is only visible to and accessible by the developer project that created the metadata.
-		
+
 	]"
 	date: "$Date$"
 	revision: "$Revision$"
@@ -75,5 +75,19 @@ feature -- Status Report
 			Result := a_value = developer_metadata_visibility_unspecified or else
 			          a_value = document or else
 			          a_value = project
+		end
+
+feature -- Eiffel to JSON
+
+	to_json: JSON_STRING
+			-- Json representation of the current object.
+		do
+			if is_document then
+				Result := "DOCUMENT"
+			elseif is_project then
+				Result := "PROJECT"
+			else
+				Result := "DEVELOPER_METADATA_VISIBILITY_UNSPECIFIED"
+			end
 		end
 end
