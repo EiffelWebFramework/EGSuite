@@ -52,6 +52,19 @@ feature -- Change Element
 			rgb_set:  rgb_color = a_rgb
 		end
 
+feature -- Eiffel to JSON
+
+	to_json: JSON_OBJECT
+		do
+			create Result.make_empty
+			if attached rgb_color as l_rgb_color then
+
+			end
+			if attached theme_color as l_theme_color then
+				Result.put (l_theme_color.to_json, "themeColor")
+			end
+		end
+
 invariant
 	kind_of_rgba: attached rgb_color implies theme_color = Void
 	kind_of_theme: attached theme_color implies rgb_color = Void

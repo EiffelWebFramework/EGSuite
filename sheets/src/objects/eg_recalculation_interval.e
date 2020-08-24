@@ -1,5 +1,13 @@
 note
-	description: "An enumeration of the possible recalculation interval options."
+	description: "[
+		An enumeration of the possible recalculation interval options.
+	
+		Enums
+	RECALCULATION_INTERVAL_UNSPECIFIED 	Default value. This value must not be used.
+	ON_CHANGE 							Volatile functions are updated on every change.
+	MINUTE 								Volatile functions are updated on every change and every minute.
+	HOUR 								Volatile functions are updated on every change and hourly.	
+	]"
 	date: "$Date$"
 	revision: "$Revision$"
 	EIS: "name=", "src=https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets#recalculationinterval", "protocol=uri"
@@ -84,6 +92,23 @@ feature -- Status Report
 			          a_value = on_change or else
 			          a_value = minute or else
 			          a_value = hour
+		end
+
+feature -- Eiffel to JSON
+
+	to_json: JSON_STRING
+			-- JSON representation of the current object
+		do
+			create Result.make_from_string ("RECALCULATION_INTERVAL_UNSPECIFIED")
+			if is_hour then
+				create Result.make_from_string ("HOUR")
+			elseif is_minute  then
+				create Result.make_from_string ("MINUTE")
+			elseif is_on_change then
+				create Result.make_from_string ("ON_CHANGE")
+			else
+				create Result.make_from_string ("RECALCULATION_INTERVAL_UNSPECIFIED")
+			end
 		end
 
 end

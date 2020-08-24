@@ -59,7 +59,7 @@ feature -- Element Change
 			sheet_id_set: sheet_id = a_id
 		end
 
-	set_start_row_inder (a_index: like start_row_index)
+	set_start_row_index (a_index: like start_row_index)
 		do
 			start_row_index := a_index
 		ensure

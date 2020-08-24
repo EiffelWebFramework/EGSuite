@@ -64,7 +64,48 @@ feature -- Spreedsheets Operations
 			end
 		end
 
-	get_from_id (a_spreadsheet_id: attached like spreadsheet_id): detachable like last_response.body
+	get_from_id (a_spreadsheet_id: attached like spreadsheet_id; a_params: detachable EG_SPREADSHEET_PARAMETERS): detachable like last_response.body
+			-- POST /spreadsheets/`a_spreadsheet_id'
+		note
+			EIS:"name=get.spreedsheets", "src=https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/get", "protocol=uri"
+		require
+			not a_spreadsheet_id.is_empty
+		local
+			l_file: PLAIN_TEXT_FILE
+			l_qry_params: STRING_TABLE [STRING]
+		do
+
+			logger.write_information ("get_from_id-> Now getting sheet from id:" + a_spreadsheet_id)
+
+			api_get_call (sheets_url ("spreadsheets/" + a_spreadsheet_id, Void), a_params)
+			check
+				attached last_response as l_response and then
+				attached l_response.body as l_body
+			then
+				parse_last_response
+				if l_response.status = {HTTP_STATUS_CODE}.ok then
+					Result := l_body
+
+					debug
+						create l_file.make_create_read_write ("/tmp/hitme_sheet_json-get_from_id.json")
+						logger.write_information ("get_from_id->Writing body into " + l_file.path.utf_8_name)
+						l_file.close
+						l_file.wipe_out
+						l_file.open_append
+
+						l_file.put_string (l_body)
+						l_file.close
+					end
+				elseif l_response.status = {HTTP_STATUS_CODE}.not_found then
+					logger.write_error ("get_from_id-> Not found:" + l_response.status.out + " %NBody: " + l_body)
+				else
+					logger.write_error ("get_from_id-> Status code invalid:" + l_response.status.out + " %NBody: " + l_body)
+				end
+			end
+		end
+
+
+	get_from_id2 (a_spreadsheet_id: attached like spreadsheet_id): detachable like last_response.body
 			-- POST /spreadsheets/`a_spreadsheet_id'
 		note
 			EIS:"name=get.spreedsheets", "src=https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/get", "protocol=uri"
@@ -304,6 +345,7 @@ feature {NONE} -- Implementation
 			logger.write_debug ("internal_api_call-> a_api_url:" + a_api_url + " method:" + a_method)
 				-- TODO improve this, so we can check the required scopes before we
 				-- do an api call.
+				-- TODO add a class with the valid scopes.
 			create config.make_default ("", "")
 			config.set_scope ("https://www.googleapis.com/auth/spreadsheets")
 
@@ -312,8 +354,8 @@ feature {NONE} -- Implementation
 			create api_service.make (create {OAUTH_20_GOOGLE_API}, config)
 				--| TODO improve cypress service creation procedure to make configuration optional.
 
-			print ("%N===Google  OAuth Workflow using OAuth access token for the owner of the application ===%N")
 				--| TODO rewrite prints as logs
+			logger.write_debug ("%N===Google  OAuth Workflow using OAuth access token for the owner of the application ===%N")
 
 				-- Create the access token that will identifies the user making the request.
 			create l_access_token.make_token_secret (access_token, "NOT_NEEDED")
@@ -336,14 +378,14 @@ feature {NONE} -- Implementation
 					request.add_header ("Content-Type", "application/json; charset=UTF-8")
 					request.add_payload (a_payload)
 				else
-					request.add_header ("Content-length", "")
+					request.add_header ("Content-length", "0")
 				end
 
 				api_service.sign_request (ll_access_token, request)
 
 				logger.write_debug ("internal_api_call->uri:'" + request.uri + "'")
 				if attached request.upload_file as l_s then
-					logger.write_debug ("internal_api_call->upload file:'" + l_s + "'")
+					logger.write_debug ("internal_api_call->upload file:'" + l_s.out + "'")
 				end
 				if attached {OAUTH_RESPONSE} request.execute as l_response then
 					last_response := l_response
@@ -453,7 +495,7 @@ feature {NONE} -- Implementation
 				create l_raw_file.make_open_read (l_upload_data.file_name.absolute_path.name)
 				if l_raw_file.exists then
 					logger.write_debug ("upload_data-> Content-type: '" + l_upload_data.content_type + "'")
-					logger.write_debug ("upload_data-> upload file name: '" + l_upload_data.file_name.absolute_path.name + "'")
+					logger.write_debug ("upload_data-> upload file name: '" + l_upload_data.file_name.absolute_path.name.out + "'")
 					request.add_header ("Content-Type", l_upload_data.content_type)
 					request.set_upload_filename (l_upload_data.file_name.absolute_path.name)
 					request.add_form_parameter("source", l_upload_data.file_name.name.as_string_32)

@@ -156,4 +156,47 @@ feature -- Change Element
 		do
 			text_rotation := a_val
 		end
+
+feature -- Eiffel to JSON
+
+	to_json: JSON_OBJECT
+--	{
+--		  "numberFormat": {
+--		    object (NumberFormat)
+--		  },
+--		  "backgroundColor": {
+--		    object (Color)
+--		  },
+--		  "backgroundColorStyle": {
+--		    object (ColorStyle)
+--		  },
+--		  "borders": {
+--		    object (Borders)
+--		  },
+--		  "padding": {
+--		    object (Padding)
+--		  },
+--		  "horizontalAlignment": enum (HorizontalAlign),
+--		  "verticalAlignment": enum (VerticalAlign),
+--		  "wrapStrategy": enum (WrapStrategy),
+--		  "textDirection": enum (TextDirection),
+--		  "textFormat": {
+--		    object (TextFormat)
+--		  },
+--		  "hyperlinkDisplayType": enum (HyperlinkDisplayType),
+--		  "textRotation": {
+--		    object (TextRotation)
+--		  }
+--		}
+
+		do
+			create Result.make_empty
+				-- TODO
+			if attached number_format as l_number_format then
+				Result.put (l_number_format.to_json, "numberFormat")
+			end
+			Result.put (background_color.to_json, "backgroundColor")
+			Result.put (background_color_style.to_json, "backgroundColorStyle")
+
+		end
 end

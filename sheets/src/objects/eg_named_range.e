@@ -31,6 +31,8 @@ feature {NONE} -- Initialization
 
 	default_create
 		do
+				-- TODO check it it's ok this default
+				-- in other case define them as detachable.
 			create named_range_id.make_empty
 			create name.make_empty
 			create range
@@ -69,4 +71,13 @@ feature -- Change Element
 		ensure
 			range_set: range = a_range
 		end
+
+feature -- Eiffel to JSON
+
+	to_json: JSON_OBJECT
+		do
+			create Result.make_empty
+			-- TODO
+		end
+
 end

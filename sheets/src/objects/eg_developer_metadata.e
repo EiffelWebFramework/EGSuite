@@ -98,4 +98,13 @@ feature -- Element Change
 			visibility_set: visibility = a_visibility
 		end
 
+
+feature -- Eiffel to JSON
+
+	to_json: JSON_OBJECT
+		do
+			create Result.make_empty
+			-- TODO
+		end
+
 end
