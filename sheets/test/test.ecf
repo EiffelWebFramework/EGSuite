@@ -31,6 +31,7 @@
 			<debug name="test_create_sheet" enabled="true"/>
 		</option>
 		<setting name="total_order_on_reals" value="true"/>
+		<library name="testing" location="$ISE_LIBRARY\library\testing\testing-safe.ecf"/>
 		<cluster name="test" location=".\" recursive="true"/>
 	</target>
 </system>

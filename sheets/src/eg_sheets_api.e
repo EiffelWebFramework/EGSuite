@@ -64,7 +64,48 @@ feature -- Spreedsheets Operations
 			end
 		end
 
-	get_from_id (a_spreadsheet_id: attached like spreadsheet_id): detachable like last_response.body
+	get_from_id (a_spreadsheet_id: attached like spreadsheet_id; a_params: detachable EG_SPREADSHEET_PARAMETERS): detachable like last_response.body
+			-- POST /spreadsheets/`a_spreadsheet_id'
+		note
+			EIS:"name=get.spreedsheets", "src=https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/get", "protocol=uri"
+		require
+			not a_spreadsheet_id.is_empty
+		local
+			l_file: PLAIN_TEXT_FILE
+			l_qry_params: STRING_TABLE [STRING]
+		do
+
+			logger.write_information ("get_from_id-> Now getting sheet from id:" + a_spreadsheet_id)
+
+			api_get_call (sheets_url ("spreadsheets/" + a_spreadsheet_id, Void), a_params)
+			check
+				attached last_response as l_response and then
+				attached l_response.body as l_body
+			then
+				parse_last_response
+				if l_response.status = {HTTP_STATUS_CODE}.ok then
+					Result := l_body
+
+					debug
+						create l_file.make_create_read_write ("/tmp/hitme_sheet_json-get_from_id.json")
+						logger.write_information ("get_from_id->Writing body into " + l_file.path.utf_8_name)
+						l_file.close
+						l_file.wipe_out
+						l_file.open_append
+
+						l_file.put_string (l_body)
+						l_file.close
+					end
+				elseif l_response.status = {HTTP_STATUS_CODE}.not_found then
+					logger.write_error ("get_from_id-> Not found:" + l_response.status.out + " %NBody: " + l_body)
+				else
+					logger.write_error ("get_from_id-> Status code invalid:" + l_response.status.out + " %NBody: " + l_body)
+				end
+			end
+		end
+
+
+	get_from_id2 (a_spreadsheet_id: attached like spreadsheet_id): detachable like last_response.body
 			-- POST /spreadsheets/`a_spreadsheet_id'
 		note
 			EIS:"name=get.spreedsheets", "src=https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/get", "protocol=uri"

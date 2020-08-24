@@ -150,7 +150,6 @@ feature -- Status Report
 			Result := value = double
 		end
 
-
 	is_valid_value (a_value: INTEGER): BOOLEAN
 			-- Can `a_value' be used in a `set_value' feature call?
 		do
