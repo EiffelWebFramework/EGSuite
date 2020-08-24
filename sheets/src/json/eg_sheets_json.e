@@ -111,6 +111,7 @@ feature {NONE} -- JSON To Eiffel
 			-- Create an object `EG_SPREADSHEET_PROPERTIES` from a json representation `a_json`.
 		local
 			l_cell_format: EG_CELL_FORMAT
+			l_ri: EG_RECALCULATION_INTERVAL
 		do
 			create Result
 			if attached string_value_from_json (a_json, "title") as l_title then
@@ -120,13 +121,15 @@ feature {NONE} -- JSON To Eiffel
 				Result.set_locale (l_locale)
 			end
 			if attached string_value_from_json (a_json, "autoRecalc") as l_auto_recalc then
+				create l_ri
 				if l_auto_recalc.is_case_insensitive_equal ("ON_CHANGE") then
-					Result.auto_recalc.set_on_change
+					l_ri.set_on_change
 				elseif l_auto_recalc.is_case_insensitive_equal ("MINUTE") then
-					Result.auto_recalc.set_minute
+					l_ri.set_minute
 				elseif l_auto_recalc.is_case_insensitive_equal ("HOUR") then
-					Result.auto_recalc.set_hour
+					l_ri.set_hour
 				end
+				Result.set_auto_recalc (l_ri)
 			end
 			if attached string_value_from_json (a_json, "timeZone") as l_time_zone then
 				Result.set_time_zone (l_time_zone)
