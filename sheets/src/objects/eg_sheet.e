@@ -72,26 +72,9 @@ note
 class
 	EG_SHEET
 
-inherit
-
-	ANY
-		redefine
-			default_create
-		end
-
-create
-	default_create
-
-feature {NONE} -- Access
-
-	default_create
-		do
-			create properties
-		end
-
 feature -- Access
 
-	properties: EG_SHEET_PROPERTIES
+	properties: detachable EG_SHEET_PROPERTIES
 			-- The properties of the sheet.
 
 	data: detachable LIST [EG_GRID_DATA]
@@ -391,4 +374,11 @@ feature -- Element Change
 			slicers_set: slicers = a_slicers
 		end
 
+
+feature -- Eiffel to JSON
+
+	to_json: JSON_OBJECT
+		do
+			create Result.make_empty
+		end
 end

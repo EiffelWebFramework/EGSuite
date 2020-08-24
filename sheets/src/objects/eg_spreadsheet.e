@@ -32,48 +32,24 @@ note
 class
 	EG_SPREADSHEET
 
-inherit
-	ANY
-		redefine
-			default_create
-		end
-
-create
-	default_create
-
-feature -- {NONE}
-
-	default_create
-		do
-			create id.make_empty
-			create url.make_empty
-			create properties
-			create {ARRAYED_LIST [EG_SHEET]} sheets.make (0)
-			create {ARRAYED_LIST [EG_NAMED_RANGE]} named_ranges.make (0)
-			create {ARRAYED_LIST [EG_DEVELOPER_METADATA]} developer_metadata.make (0)
-		ensure then
-			id_set: id.is_empty
-			url_set: url.is_empty
-		end
-
 feature -- Access
 
-	id: IMMUTABLE_STRING_8
+	id: detachable IMMUTABLE_STRING_8
 			-- The ID of the spreadsheet. This field is read-only.
 
-	properties: EG_SPREADSHEET_PROPERTIES
+	properties: detachable EG_SPREADSHEET_PROPERTIES
 			-- Overall properties of a spreadsheet.
 
-	sheets: LIST [EG_SHEET]
+	sheets: detachable LIST [EG_SHEET]
 			-- The sheets that are part of a spreadsheet.
 
-	named_ranges: LIST [EG_NAMED_RANGE]
+	named_ranges: detachable LIST [EG_NAMED_RANGE]
 			-- The named ranges defined in a spreadsheet.
 
-	url: IMMUTABLE_STRING_8
+	url: detachable IMMUTABLE_STRING_8
 			-- The url of the spreadsheet. This field is read-only.
 
-	developer_metadata: LIST [EG_DEVELOPER_METADATA]
+	developer_metadata: detachable LIST [EG_DEVELOPER_METADATA]
 			-- The developer metadata associated with a spreadsheet.
 
 
@@ -97,11 +73,21 @@ feature -- Change Element
 
 	force_sheet (a_sheet: EG_SHEET)
 			-- Add a sheet `a_sheet` to the list of sheets.
+		local
+			l_sheets: like sheets
 		do
-			sheets.force (a_sheet)
+			l_sheets := sheets
+			if l_sheets /= Void then
+				l_sheets.force (a_sheet)
+			else
+				create {ARRAYED_LIST [EG_SHEET]} l_sheets.make (2)
+				l_sheets.force (a_sheet)
+			end
+			sheets := l_sheets
 		end
 
 	set_sheets (a_sheets: like sheets)
+			-- Set the list of `sheets` with `a_sheets`.
 		do
 			sheets := a_sheets
 		ensure
@@ -110,11 +96,21 @@ feature -- Change Element
 
 	force_name_range (a_range: EG_NAMED_RANGE)
 			-- Add a range `a_range` to the list of ranges.
+		local
+			l_named_ranges: like named_ranges
 		do
-			named_ranges.force (a_range)
+			l_named_ranges := named_ranges
+			if l_named_ranges /= Void then
+				l_named_ranges.force (a_range)
+			else
+				create {ARRAYED_LIST [EG_NAMED_RANGE]} l_named_ranges.make (2)
+				l_named_ranges.force (a_range)
+			end
+			named_ranges := l_named_ranges
 		end
 
 	set_named_ranges (a_named_ranges: like named_ranges)
+			-- Set the list `named_ranges` with `a_named_ranges`.
 		do
 			named_ranges := a_named_ranges
 		ensure
@@ -123,11 +119,21 @@ feature -- Change Element
 
 	force_developer_metadata (a_metadata: EG_DEVELOPER_METADATA)
 			-- Set developer metadata `a_metadata` to metadata.
+		local
+			l_developer_metadata: like developer_metadata
 		do
-			developer_metadata.force (a_metadata)
+			l_developer_metadata := developer_metadata
+			if l_developer_metadata /= Void then
+				l_developer_metadata.force (a_metadata)
+			else
+				create {ARRAYED_LIST [EG_DEVELOPER_METADATA]} l_developer_metadata.make (2)
+				l_developer_metadata.force (a_metadata)
+			end
+			developer_metadata := l_developer_metadata
 		end
 
 	set_developer_metadata (a_metadata: like developer_metadata)
+			-- Set the list `developer_metadata` with `a_metadata`.
 		do
 			developer_metadata := a_metadata
 		ensure
@@ -145,7 +151,7 @@ feature {EG_SHEETS_JSON} -- Factory
 			create id.make_from_string (a_id)
 		ensure
 			is_id_set: is_id_set
-			id_set: id.is_case_insensitive_equal (a_id)
+			id_set: attached id as l_id and then l_id.is_case_insensitive_equal (a_id)
 		end
 
 	set_url (a_url: STRING)
@@ -156,7 +162,7 @@ feature {EG_SHEETS_JSON} -- Factory
 			is_url_set := True
 			create url.make_from_string (a_url)
 		ensure
-			url_set: url.is_case_insensitive_equal (a_url)
+			url_set: attached url as l_url and then l_url.is_case_insensitive_equal (a_url)
 			is_url_set: is_url_set
 		end
 
@@ -164,15 +170,40 @@ feature -- Eiffel to JSON
 
 	to_json: JSON_OBJECT
 			-- Json representation of the Current object.
+		local
+			l_array: JSON_ARRAY
 		do
 			create Result.make_with_capacity (2)
-			Result.put (create {JSON_STRING}.make_from_string (id), "spreadsheetId")
-			Result.put (properties.to_json, "properties")
-			-- properties JSON_OBJECT
-			-- sheets JSON_ARRAY
-			-- namedRanges : JSON_ARRAY
-			Result.put (create {JSON_STRING}.make_from_string (url), "spreadsheetUrl")
-			-- developerMetadata JSON_ARRAY
+			if attached id as l_id then
+				Result.put (create {JSON_STRING}.make_from_string (l_id), "spreadsheetId")
+			end
+			if attached properties as l_properties then
+				Result.put (l_properties.to_json, "properties")
+			end
+			if attached sheets as l_sheets then
+				create l_array.make (l_sheets.count)
+				across l_sheets as ic loop
+					l_array.add (ic.item.to_json)
+				end
+				Result.put (l_array, "sheets")
+			end
+			if attached named_ranges as l_named_ranges then
+				create l_array.make (l_named_ranges.count)
+				across l_named_ranges as ic loop
+					l_array.add (ic.item.to_json)
+				end
+				Result.put (l_array, "namedRanges")
+			end
+			if attached url as l_url then
+				Result.put (create {JSON_STRING}.make_from_string (l_url), "spreadsheetUrl")
+			end
+			if attached developer_metadata as l_developer_metadata then
+				create l_array.make (l_developer_metadata.count)
+				across l_developer_metadata as ic loop
+					l_array.add (ic.item.to_json)
+				end
+				Result.put (l_array, "developerMetadata")
+			end
 		end
 
 

@@ -71,4 +71,13 @@ feature -- Change Element
 		ensure
 			range_set: range = a_range
 		end
+
+feature -- Eiffel to JSON
+
+	to_json: JSON_OBJECT
+		do
+			create Result.make_empty
+			-- TODO
+		end
+
 end

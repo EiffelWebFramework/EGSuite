@@ -53,7 +53,7 @@ feature -- 	Get
 		note
 			EIS:"name=get.spreedsheets", "src=https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/get", "protocol=uri"
 		do
-			if attached eg_sheets_api.create_spreedsheet as s then
+			if attached eg_sheets_api.get_from_id (a_spreadsheet_id, a_params) as s then
 				if attached parsed_json (s) as j then
 					Result := eg_spreadsheet (Void, j)
 				else

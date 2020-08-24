@@ -48,7 +48,6 @@ feature -- Test routines
 			assert ("fields", to_query (l_qry).is_case_insensitive_equal ("fields=sheets.data,properties.title,sheets.properties"))
 		end
 
-
 	test_get_spreadsheets_parameters_includegriddata_false
 			-- New test routine
 		local
