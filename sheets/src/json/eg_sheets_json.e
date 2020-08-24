@@ -47,6 +47,21 @@ feature -- Post
 			end
 		end
 
+feature -- 	Get
+
+	get_from_id (a_spreadsheet_id: STRING_8; a_params: detachable EG_SPREADSHEET_PARAMETERS): detachable EG_SPREADSHEET
+		note
+			EIS:"name=get.spreedsheets", "src=https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/get", "protocol=uri"
+		do
+			if attached eg_sheets_api.create_spreedsheet as s then
+				if attached parsed_json (s) as j then
+					Result := eg_spreadsheet (Void, j)
+				else
+					-- set error
+				end
+			end
+	end
+
 feature -- Error
 
 	last_error: detachable STRING

@@ -30,5 +30,15 @@ feature -- Post
 		deferred
 		end
 
+feature -- Get
+
+	get_from_id (a_spreadsheet_id: STRING_8; a_params: detachable EG_SPREADSHEET_PARAMETERS): detachable EG_SPREADSHEET
+		note
+			EIS:"name=get.spreedsheets", "src=https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/get", "protocol=uri"
+		require
+			valid_id: not a_spreadsheet_id.is_empty
+		deferred
+		end
+
 
 end

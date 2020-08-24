@@ -17,6 +17,7 @@ feature -- {NONE}
 
 	make
 		do
+			-- TODO improve this code so we can select which integration test we want to run.
 			logger.write_information ("make-> ======================> Starting application")
 
 			set_from_json_credentials_file_path (create {PATH}.make_from_string (CREDENTIALS_PATH))
