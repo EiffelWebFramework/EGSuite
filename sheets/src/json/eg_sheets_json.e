@@ -140,6 +140,9 @@ feature {NONE} -- JSON To Eiffel
 
 	cell_format (a_json: JSON_OBJECT): EG_CELL_FORMAT
 			-- Create an object `EG_CELL_FORMAT` from a json representation `a_json`
+		local
+			l_vl: EG_VERTICAL_ALIGN
+			l_ws: EG_WRAP_STRATEGY
 		do
 			create Result
 
@@ -150,25 +153,29 @@ feature {NONE} -- JSON To Eiffel
 				Result.set_padding (padding (l_padding))
 			end
 			if attached string_value_from_json (a_json, "verticalAlignment") as l_alignment then
+				create l_vl
 				if l_alignment.is_case_insensitive_equal ("BOTTOM") then
-					Result.vertical_alignment.set_bottom
+					l_vl.set_bottom
 				elseif l_alignment.is_case_insensitive_equal ("MIDDLE") then
-					Result.vertical_alignment.set_middle
+					l_vl.set_middle
 				elseif l_alignment.is_case_insensitive_equal ("TOP") then
-					Result.vertical_alignment.set_top
+					l_vl.set_top
 				end
+				Result.set_vertical_alignment (l_vl)
 			end
 			if attached string_value_from_json (a_json, "wrapStrategy") as l_wrap_strategy then
+				create l_ws
 				if l_wrap_strategy.is_case_insensitive_equal ("OVERFLOW_CELL") then
-					Result.wrap_strategy.set_overflow_cell
+					l_ws.set_overflow_cell
 				end
 				if l_wrap_strategy.is_case_insensitive_equal ("LEGACY_WRAP") then
-					Result.wrap_strategy.set_legacy_wrap
+					l_ws.set_legacy_wrap
 				elseif l_wrap_strategy.is_case_insensitive_equal ("CLIP") then
-					Result.wrap_strategy.set_clip
+					l_ws.set_clip
 				elseif l_wrap_strategy.is_case_insensitive_equal ("WRAP") then
-					Result.wrap_strategy.set_wrap
+					l_ws.set_wrap
 				end
+				Result.set_wrap_strategy (l_ws)
 			end
 			if attached {JSON_OBJECT} json_value (a_json, "textFormat") as l_text_format then
 				Result.set_text_format (text_format (l_text_format))
