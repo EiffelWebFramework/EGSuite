@@ -111,6 +111,7 @@ feature {NONE} -- JSON To Eiffel
 			-- Create an object `EG_SPREADSHEET_PROPERTIES` from a json representation `a_json`.
 		local
 			l_cell_format: EG_CELL_FORMAT
+			l_ri: EG_RECALCULATION_INTERVAL
 		do
 			create Result
 			if attached string_value_from_json (a_json, "title") as l_title then
@@ -120,58 +121,177 @@ feature {NONE} -- JSON To Eiffel
 				Result.set_locale (l_locale)
 			end
 			if attached string_value_from_json (a_json, "autoRecalc") as l_auto_recalc then
+				create l_ri
 				if l_auto_recalc.is_case_insensitive_equal ("ON_CHANGE") then
-					Result.auto_recalc.set_on_change
+					l_ri.set_on_change
 				elseif l_auto_recalc.is_case_insensitive_equal ("MINUTE") then
-					Result.auto_recalc.set_minute
+					l_ri.set_minute
 				elseif l_auto_recalc.is_case_insensitive_equal ("HOUR") then
-					Result.auto_recalc.set_hour
+					l_ri.set_hour
 				end
+				Result.set_auto_recalc (l_ri)
 			end
 			if attached string_value_from_json (a_json, "timeZone") as l_time_zone then
 				Result.set_time_zone (l_time_zone)
 			end
 			if attached {JSON_OBJECT} json_value (a_json, "defaultFormat") as l_default_format then
+				Result.set_default_format (cell_format (l_default_format))
 			end
+			if attached {JSON_OBJECT} json_value (a_json, "iterativeCalculationSettings") as  iterativeCalculationSettings then
+				-- Result.set_iterative_calculation_settings (a_iterative_calculation_settings: [like iterative_calculation_settings] detachable EG_ITERATIVE_CALCULATION_SETTINGS)
+			end
+			if attached {JSON_OBJECT} json_value (a_json, "spreadsheetTheme") as l_spreadsheet then
+				Result.set_spreadsheet_theme (spreadsheet_theme (l_spreadsheet))
+			end
+		end
+
+	spreadsheet_theme (a_json: JSON_VALUE): EG_SPREADSHEET_THEME
+			-- Create an object `EG_SPREADSHEET_THEME` from a json representation `a_json`.
+		do
+			create Result
+			if attached string_value_from_json (a_json, "primaryFontFamily") as l_primary_font then
+				Result.set_primary_font_family (l_primary_font)
+			end
+			if attached {JSON_ARRAY} json_value (a_json, "themeColors") as l_theme_colors then
+				across l_theme_colors as ic  loop
+					Result.force_theme_color (theme_color_pair (ic.item))
+				end
+			end
+		end
+
+	theme_color_pair (a_json: JSON_VALUE): EG_THEME_COLOR_PAIR
+		local
+			l_tc: EG_THEME_COLOR
+		do
+			create Result
+			if attached string_value_from_json (a_json, "colorType") as l_color_type then
+				create l_tc
+				if l_color_type.is_case_insensitive_equal ("TEXT") then
+					l_tc.set_text
+				elseif l_color_type.is_case_insensitive_equal ("BACKGROUND") then
+					l_tc.set_background
+				elseif l_color_type.is_case_insensitive_equal ("ACCENT1") then
+					l_tc.set_accent1
+				elseif l_color_type.is_case_insensitive_equal ("ACCENT2") then
+					l_tc.set_accent2
+				elseif l_color_type.is_case_insensitive_equal ("ACCENT3") then
+					l_tc.set_accent3
+				elseif l_color_type.is_case_insensitive_equal ("ACCENT4") then
+					l_tc.set_accent4
+				elseif l_color_type.is_case_insensitive_equal ("ACCENT5") then
+					l_tc.set_accent5
+				elseif l_color_type.is_case_insensitive_equal ("ACCENT6") then
+					l_tc.set_accent6
+				elseif l_color_type.is_case_insensitive_equal ("LINK") then
+					l_tc.set_link
+				end
+				Result.set_color_type (l_tc)
+			end
+			if attached {JSON_OBJECT} json_value (a_json, "color") as l_color  then
+				Result.set_color (eg_color_style (l_color))
+			end
+
 		end
 
 	cell_format (a_json: JSON_OBJECT): EG_CELL_FORMAT
 			-- Create an object `EG_CELL_FORMAT` from a json representation `a_json`
+		local
+			l_vl: EG_VERTICAL_ALIGN
+			l_ws: EG_WRAP_STRATEGY
+			l_hl: EG_HORIZONTAL_ALIGN
+			l_td: EG_TEXT_DIRECTION
+			l_hyper: EG_HYPERLINK_DISPLAY_TYPE
 		do
 			create Result
+			if attached {JSON_OBJECT} json_value (a_json, "numberFormat") as l_number_format then
+				Result.set_number_format (Void)
+			end
 
 			if attached {JSON_OBJECT} json_value (a_json, "backgroundColor") as l_background_color then
 				Result.set_background_color (eg_color (l_background_color))
 			end
+			if attached {JSON_OBJECT} json_value (a_json, "backgroundColorStyle") as l_background_color_style then
+				Result.set_background_color_style (eg_color_style (l_background_color_style))
+			end
+			if attached {JSON_OBJECT} json_value (a_json, "borders") as l_borders then
+				Result.set_borders (Void)
+			end
 			if attached {JSON_OBJECT} json_value (a_json, "padding") as l_padding then
 				Result.set_padding (padding (l_padding))
 			end
-			if attached string_value_from_json (a_json, "verticalAlignment") as l_alignment then
-				if l_alignment.is_case_insensitive_equal ("BOTTOM") then
-					Result.vertical_alignment.set_bottom
-				elseif l_alignment.is_case_insensitive_equal ("MIDDLE") then
-					Result.vertical_alignment.set_middle
-				elseif l_alignment.is_case_insensitive_equal ("TOP") then
-					Result.vertical_alignment.set_top
+			if attached string_value_from_json (a_json, "horizontalAlignment") as l_alignment then
+				create l_hl
+				if l_alignment.is_case_insensitive_equal ("LEFT") then
+					l_hl.set_left
+				elseif l_alignment.is_case_insensitive_equal ("CENTER") then
+					l_hl.set_center
+				elseif l_alignment.is_case_insensitive_equal ("RIGHT") then
+					l_hl.set_right
 				end
+				Result.set_horizontal_alignment (l_hl)
+			end
+			if attached string_value_from_json (a_json, "verticalAlignment") as l_alignment then
+				create l_vl
+				if l_alignment.is_case_insensitive_equal ("BOTTOM") then
+					l_vl.set_bottom
+				elseif l_alignment.is_case_insensitive_equal ("MIDDLE") then
+					l_vl.set_middle
+				elseif l_alignment.is_case_insensitive_equal ("TOP") then
+					l_vl.set_top
+				end
+				Result.set_vertical_alignment (l_vl)
 			end
 			if attached string_value_from_json (a_json, "wrapStrategy") as l_wrap_strategy then
+				create l_ws
 				if l_wrap_strategy.is_case_insensitive_equal ("OVERFLOW_CELL") then
-					Result.wrap_strategy.set_overflow_cell
+					l_ws.set_overflow_cell
 				end
 				if l_wrap_strategy.is_case_insensitive_equal ("LEGACY_WRAP") then
-					Result.wrap_strategy.set_legacy_wrap
+					l_ws.set_legacy_wrap
 				elseif l_wrap_strategy.is_case_insensitive_equal ("CLIP") then
-					Result.wrap_strategy.set_clip
+					l_ws.set_clip
 				elseif l_wrap_strategy.is_case_insensitive_equal ("WRAP") then
-					Result.wrap_strategy.set_wrap
+					l_ws.set_wrap
 				end
+				Result.set_wrap_strategy (l_ws)
+			end
+			if attached string_value_from_json (a_json, "textDirection") as l_text_direction then
+				create l_td
+				if l_text_direction.is_case_insensitive_equal ("LEFT_TO_RIGHT") then
+					l_td.set_left_to_right
+				end
+				if l_text_direction.is_case_insensitive_equal ("RIGHT_TO_LEFT") then
+					l_td.set_right_to_left
+				end
+				Result.set_text_direction (l_td)
 			end
 			if attached {JSON_OBJECT} json_value (a_json, "textFormat") as l_text_format then
 				Result.set_text_format (text_format (l_text_format))
 			end
-			if attached {JSON_OBJECT} json_value (a_json, "backgroundColorStyle") as l_background_color_style then
-				Result.set_background_color_style (eg_color_style (l_background_color_style))
+			if attached string_value_from_json (a_json, "hyperlinkDisplayType") as hyperlink then
+				create l_hyper
+				if hyperlink.is_case_insensitive_equal ("LINKED") then
+					l_hyper.set_linked
+				end
+				if hyperlink.is_case_insensitive_equal ("PLAIN_TEXT") then
+					l_hyper.set_plain_text
+				end
+				Result.set_hyperlink_display_type (l_hyper)
+			end
+			if attached {JSON_OBJECT} json_value (a_json, "textRotation") as l_text_rotation then
+				Result.set_text_rotation (text_rotation (l_text_rotation))
+			end
+		end
+
+	text_rotation (a_json: JSON_OBJECT): EG_TEXT_ROTATION
+			-- Create an object `EG_TEXT_ROTATION` from a json representation.
+		do
+			create Result
+			if attached integer_value_from_json (a_json, "angle") as l_val then
+				Result.set_angle (l_val)
+			end
+			if attached boolean_value_from_json (a_json, "vertical") as l_val then
+				Result.set_vertical (l_val)
 			end
 		end
 
@@ -179,24 +299,16 @@ feature {NONE} -- JSON To Eiffel
 			-- Create an object `EG_COLOR` from a json rerpesentation `a_json`.
 		do
 			create Result
-			if attached integer_value_from_json (a_json, "red") as l_val then
-				Result.set_red (l_val)
-			elseif attached real_value_from_json (a_json, "red") as l_val then
+			if attached real_value_from_json (a_json, "red") as l_val then
 				Result.set_red (l_val)
 			end
-			if attached integer_value_from_json (a_json, "green") as l_val then
-				Result.set_green (l_val)
-			elseif attached real_value_from_json (a_json, "green") as l_val then
+			if attached real_value_from_json (a_json, "green") as l_val then
 				Result.set_green (l_val)
 			end
-			if attached integer_value_from_json (a_json, "blue") as l_val then
-				Result.set_blue (l_val)
-			elseif attached real_value_from_json (a_json, "blue") as l_val then
+			if attached real_value_from_json (a_json, "blue") as l_val then
 				Result.set_blue (l_val)
 			end
-			if attached integer_value_from_json (a_json, "alpha") as l_val then
-				Result.set_alpha (l_val)
-			elseif attached real_value_from_json (a_json, "alpha") as l_val then
+			if attached real_value_from_json (a_json, "alpha") as l_val then
 				Result.set_alpha (l_val)
 			end
 		end
@@ -409,6 +521,8 @@ feature {NONE} -- JSON To Eiffel
 
 	eg_developer_metadata (a_json: JSON_VALUE): EG_DEVELOPER_METADATA
 			-- Create an object `EG_DEVELOPER_METADATA` from a json representation `a_json`.
+		local
+			l_vs: EG_DEVELOPER_METADATA_VISIBILITY
 		do
 			create Result
 			if attached integer_value_from_json (a_json, "metadataId") as l_metadata_id then
@@ -424,11 +538,13 @@ feature {NONE} -- JSON To Eiffel
 				Result.set_location (developer_metadata_location (l_location))
 			end
 			if attached string_value_from_json (a_json, "visibility") as l_visibility then
+				create l_vs
 				if l_visibility.is_case_insensitive_equal ("DOCUMENT") then
-					Result.visibility.set_document
+					l_vs.set_document
 				elseif l_visibility.is_case_insensitive_equal ("PROJECT") then
-					Result.visibility.set_project
+					l_vs.set_project
 				end
+				Result.set_visibility (l_vs)
 			end
 		end
 

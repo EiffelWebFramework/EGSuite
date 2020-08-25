@@ -8,7 +8,7 @@ note
 	  "green": number,
 	  "blue": number,
 	  "alpha": number
-	}	
+	}
 
 	]"
 	date: "$Date$"
@@ -76,7 +76,7 @@ feature -- Eiffel to JSON
 			create Result.make_with_capacity (4)
 			Result.put (create {JSON_NUMBER}.make_real (red), "red")
 			Result.put (create {JSON_NUMBER}.make_real (green), "green")
-			Result.put (create {JSON_NUMBER}.make_real (green), "blue")
+			Result.put (create {JSON_NUMBER}.make_real (blue), "blue")
 			Result.put (create {JSON_NUMBER}.make_real (alpha), "alpha")
 		end
 

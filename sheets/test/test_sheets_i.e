@@ -26,10 +26,10 @@ feature -- {NONE}
 				-- Test default.
 			logger.write_information ("Get spreadsheet from id without parameters")
 			test_get_sheet ("1j5CTkpgOc6Y5qgYdA_klZYjNhmN2KYocoZAdM4Y61tw", Void)
-			logger.write_information ("Get spreadsheet from id with parameters")
-			create l_param.make (2)
-			l_param.include_grid_data (True)
-			test_get_sheet ("1j5CTkpgOc6Y5qgYdA_klZYjNhmN2KYocoZAdM4Y61tw", l_param)
+--			logger.write_information ("Get spreadsheet from id with parameters")
+--			create l_param.make (2)
+--			l_param.include_grid_data (True)
+--			test_get_sheet ("1j5CTkpgOc6Y5qgYdA_klZYjNhmN2KYocoZAdM4Y61tw", l_param)
 		end
 
 

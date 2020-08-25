@@ -136,4 +136,21 @@ feature -- Status Report
 			          a_value = clip or else
 			          a_value = wrap
 		end
+
+feature -- Eiffel to JSON
+
+	to_json: JSON_STRING
+		do
+			if is_wrap then
+				Result := "WRAP"
+			elseif is_clip then
+				Result := "CLIP"
+			elseif is_legacy_wrap then
+				Result := "LEGACY_WRAP"
+			elseif is_overflow_cell then
+				Result := "OVERFLOW_CELL"
+			else
+				Result := "WRAP_STRATEGY_UNSPECIFIED"
+			end
+		end
 end

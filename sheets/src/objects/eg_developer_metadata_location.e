@@ -22,27 +22,17 @@ note
 class
 	EG_DEVELOPER_METADATA_LOCATION
 
-inherit
-
-	ANY
-		redefine
-			default_create
-		end
-
-create
-	default_create
-
-
-feature	{NONE} -- Initialization
-
-	default_create
-		do
-			create location_type
-		end
-
 feature -- Access
 
-	location_type: EG_DEVELOPER_METADATA_LOCATION_TYPE
+	location_type: detachable EG_DEVELOPER_METADATA_LOCATION_TYPE
 
+
+feature -- Eiffel to JSON
+
+	to_json: JSON_OBJECT
+		do
+			create Result.make_empty
+			-- TOSO
+		end
 
 end
