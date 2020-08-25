@@ -224,6 +224,27 @@ feature -- Eiffel to JSON
 			if attached padding as l_padding then
 				Result.put (l_padding.to_json, "padding")
 			end
+			if attached horizontal_alignment as l_ha then
+				Result.put (l_ha.to_json, "horizontalAlignment")
+			end
+			if attached vertical_alignment as l_va then
+				Result.put (l_va.to_json, "verticalAlignment")
+			end
+			if attached wrap_strategy as l_ws then
+				Result.put (l_ws.to_json, "wrapStrategy")
+			end
+			if attached text_direction as l_td then
+				Result.put (l_td.to_json, "textDirection")
+			end
+			if attached text_format as l_tf then
+				Result.put (l_tf.to_json, "textFormat")
+			end
+			if attached hyperlink_display_type as l_hyper then
+				Result.put (l_hyper.to_json, "hyperlinkDisplayType")
+			end
+			if attached text_rotation as l_rt then
+				Result.put (l_rt.to_json, "textRotation")
+			end
 
 		end
 end

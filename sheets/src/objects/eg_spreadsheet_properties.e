@@ -134,6 +134,9 @@ feature -- Eiffel to JSON
 			if attached time_zone as l_time_zone then
 				Result.put (create {JSON_STRING}.make_from_string (l_time_zone), "timeZone")
 			end
+			if attached default_format as l_format then
+				Result.put (l_format.to_json ,"defaultFormat")
+			end
 			if attached iterative_calculation_settings  as l_ics then
 				Result.put (l_ics.to_json, "iterativeCalculationSettings")
 			end

@@ -135,6 +135,13 @@ feature {NONE} -- JSON To Eiffel
 				Result.set_time_zone (l_time_zone)
 			end
 			if attached {JSON_OBJECT} json_value (a_json, "defaultFormat") as l_default_format then
+				Result.set_default_format (cell_format (l_default_format))
+			end
+			if attached {JSON_OBJECT} json_value (a_json, "iterativeCalculationSettings") as  iterativeCalculationSettings then
+				-- Result.set_iterative_calculation_settings (a_iterative_calculation_settings: [like iterative_calculation_settings] detachable EG_ITERATIVE_CALCULATION_SETTINGS)
+			end
+			if attached {JSON_OBJECT} json_value (a_json, "spreadsheetTheme") as  spreadsheetTheme then
+				-- Result.set_spreadsheet_theme (a_theme: [like spreadsheet_theme] detachable EG_SPREADSHEET_THEME)
 			end
 		end
 
@@ -143,14 +150,37 @@ feature {NONE} -- JSON To Eiffel
 		local
 			l_vl: EG_VERTICAL_ALIGN
 			l_ws: EG_WRAP_STRATEGY
+			l_hl: EG_HORIZONTAL_ALIGN
+			l_td: EG_TEXT_DIRECTION
+			l_hyper: EG_HYPERLINK_DISPLAY_TYPE
 		do
 			create Result
+			if attached {JSON_OBJECT} json_value (a_json, "numberFormat") as l_number_format then
+				Result.set_number_format (Void)
+			end
 
 			if attached {JSON_OBJECT} json_value (a_json, "backgroundColor") as l_background_color then
 				Result.set_background_color (eg_color (l_background_color))
 			end
+			if attached {JSON_OBJECT} json_value (a_json, "backgroundColorStyle") as l_background_color_style then
+				Result.set_background_color_style (eg_color_style (l_background_color_style))
+			end
+			if attached {JSON_OBJECT} json_value (a_json, "borders") as l_borders then
+				Result.set_borders (Void)
+			end
 			if attached {JSON_OBJECT} json_value (a_json, "padding") as l_padding then
 				Result.set_padding (padding (l_padding))
+			end
+			if attached string_value_from_json (a_json, "horizontalAlignment") as l_alignment then
+				create l_hl
+				if l_alignment.is_case_insensitive_equal ("LEFT") then
+					l_hl.set_left
+				elseif l_alignment.is_case_insensitive_equal ("CENTER") then
+					l_hl.set_center
+				elseif l_alignment.is_case_insensitive_equal ("RIGHT") then
+					l_hl.set_right
+				end
+				Result.set_horizontal_alignment (l_hl)
 			end
 			if attached string_value_from_json (a_json, "verticalAlignment") as l_alignment then
 				create l_vl
@@ -177,11 +207,43 @@ feature {NONE} -- JSON To Eiffel
 				end
 				Result.set_wrap_strategy (l_ws)
 			end
+			if attached string_value_from_json (a_json, "textDirection") as l_text_direction then
+				create l_td
+				if l_text_direction.is_case_insensitive_equal ("LEFT_TO_RIGHT") then
+					l_td.set_left_to_right
+				end
+				if l_text_direction.is_case_insensitive_equal ("RIGHT_TO_LEFT") then
+					l_td.set_right_to_left
+				end
+				Result.set_text_direction (l_td)
+			end
 			if attached {JSON_OBJECT} json_value (a_json, "textFormat") as l_text_format then
 				Result.set_text_format (text_format (l_text_format))
 			end
-			if attached {JSON_OBJECT} json_value (a_json, "backgroundColorStyle") as l_background_color_style then
-				Result.set_background_color_style (eg_color_style (l_background_color_style))
+			if attached string_value_from_json (a_json, "hyperlinkDisplayType") as hyperlink then
+				create l_hyper
+				if hyperlink.is_case_insensitive_equal ("LINKED") then
+					l_hyper.set_linked
+				end
+				if hyperlink.is_case_insensitive_equal ("PLAIN_TEXT") then
+					l_hyper.set_plain_text
+				end
+				Result.set_hyperlink_display_type (l_hyper)
+			end
+			if attached {JSON_OBJECT} json_value (a_json, "textRotation") as l_text_rotation then
+				Result.set_text_rotation (text_rotation (l_text_rotation))
+			end
+		end
+
+	text_rotation (a_json: JSON_OBJECT): EG_TEXT_ROTATION
+			-- Create an object `EG_TEXT_ROTATION` from a json representation.
+		do
+			create Result
+			if attached integer_value_from_json (a_json, "angle") as l_val then
+				Result.set_angle (l_val)
+			end
+			if attached boolean_value_from_json (a_json, "vertical") as l_val then
+				Result.set_vertical (l_val)
 			end
 		end
 

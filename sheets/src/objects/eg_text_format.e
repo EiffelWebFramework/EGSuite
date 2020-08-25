@@ -140,4 +140,12 @@ feature -- Change Element
 			underline_set: underline = a_underline
 		end
 
+
+feature -- Eiffel to JSON
+
+	to_json: JSON_OBJECT
+		do
+			create Result.make_empty
+			-- TODO
+		end
 end
