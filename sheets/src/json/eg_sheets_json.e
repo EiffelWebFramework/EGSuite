@@ -140,9 +140,57 @@ feature {NONE} -- JSON To Eiffel
 			if attached {JSON_OBJECT} json_value (a_json, "iterativeCalculationSettings") as  iterativeCalculationSettings then
 				-- Result.set_iterative_calculation_settings (a_iterative_calculation_settings: [like iterative_calculation_settings] detachable EG_ITERATIVE_CALCULATION_SETTINGS)
 			end
-			if attached {JSON_OBJECT} json_value (a_json, "spreadsheetTheme") as  spreadsheetTheme then
-				-- Result.set_spreadsheet_theme (a_theme: [like spreadsheet_theme] detachable EG_SPREADSHEET_THEME)
+			if attached {JSON_OBJECT} json_value (a_json, "spreadsheetTheme") as l_spreadsheet then
+				Result.set_spreadsheet_theme (spreadsheet_theme (l_spreadsheet))
 			end
+		end
+
+	spreadsheet_theme (a_json: JSON_VALUE): EG_SPREADSHEET_THEME
+			-- Create an object `EG_SPREADSHEET_THEME` from a json representation `a_json`.
+		do
+			create Result
+			if attached string_value_from_json (a_json, "primaryFontFamily") as l_primary_font then
+				Result.set_primary_font_family (l_primary_font)
+			end
+			if attached {JSON_ARRAY} json_value (a_json, "themeColors") as l_theme_colors then
+				across l_theme_colors as ic  loop
+					Result.force_theme_color (theme_color_pair (ic.item))
+				end
+			end
+		end
+
+	theme_color_pair (a_json: JSON_VALUE): EG_THEME_COLOR_PAIR
+		local
+			l_tc: EG_THEME_COLOR
+		do
+			create Result
+			if attached string_value_from_json (a_json, "colorType") as l_color_type then
+				create l_tc
+				if l_color_type.is_case_insensitive_equal ("TEXT") then
+					l_tc.set_text
+				elseif l_color_type.is_case_insensitive_equal ("BACKGROUND") then
+					l_tc.set_background
+				elseif l_color_type.is_case_insensitive_equal ("ACCENT1") then
+					l_tc.set_accent1
+				elseif l_color_type.is_case_insensitive_equal ("ACCENT2") then
+					l_tc.set_accent2
+				elseif l_color_type.is_case_insensitive_equal ("ACCENT3") then
+					l_tc.set_accent3
+				elseif l_color_type.is_case_insensitive_equal ("ACCENT4") then
+					l_tc.set_accent4
+				elseif l_color_type.is_case_insensitive_equal ("ACCENT5") then
+					l_tc.set_accent5
+				elseif l_color_type.is_case_insensitive_equal ("ACCENT6") then
+					l_tc.set_accent6
+				elseif l_color_type.is_case_insensitive_equal ("LINK") then
+					l_tc.set_link
+				end
+				Result.set_color_type (l_tc)
+			end
+			if attached {JSON_OBJECT} json_value (a_json, "color") as l_color  then
+				Result.set_color (eg_color_style (l_color))
+			end
+
 		end
 
 	cell_format (a_json: JSON_OBJECT): EG_CELL_FORMAT
@@ -251,24 +299,16 @@ feature {NONE} -- JSON To Eiffel
 			-- Create an object `EG_COLOR` from a json rerpesentation `a_json`.
 		do
 			create Result
-			if attached integer_value_from_json (a_json, "red") as l_val then
-				Result.set_red (l_val)
-			elseif attached real_value_from_json (a_json, "red") as l_val then
+			if attached real_value_from_json (a_json, "red") as l_val then
 				Result.set_red (l_val)
 			end
-			if attached integer_value_from_json (a_json, "green") as l_val then
-				Result.set_green (l_val)
-			elseif attached real_value_from_json (a_json, "green") as l_val then
+			if attached real_value_from_json (a_json, "green") as l_val then
 				Result.set_green (l_val)
 			end
-			if attached integer_value_from_json (a_json, "blue") as l_val then
-				Result.set_blue (l_val)
-			elseif attached real_value_from_json (a_json, "blue") as l_val then
+			if attached real_value_from_json (a_json, "blue") as l_val then
 				Result.set_blue (l_val)
 			end
-			if attached integer_value_from_json (a_json, "alpha") as l_val then
-				Result.set_alpha (l_val)
-			elseif attached real_value_from_json (a_json, "alpha") as l_val then
+			if attached real_value_from_json (a_json, "alpha") as l_val then
 				Result.set_alpha (l_val)
 			end
 		end

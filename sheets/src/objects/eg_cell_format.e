@@ -215,9 +215,6 @@ feature -- Eiffel to JSON
 			if attached background_color as l_bg then
 				Result.put (l_bg.to_json, "backgroundColor")
 			end
-			if attached background_color_style as l_bgs then
-				Result.put (l_bgs.to_json, "backgroundColorStyle")
-			end
 			if attached borders as lb then
 				Result.put (lb.to_json, "borders")
 			end
@@ -238,6 +235,9 @@ feature -- Eiffel to JSON
 			end
 			if attached text_format as l_tf then
 				Result.put (l_tf.to_json, "textFormat")
+			end
+			if attached background_color_style as l_bgs then
+				Result.put (l_bgs.to_json, "backgroundColorStyle")
 			end
 			if attached hyperlink_display_type as l_hyper then
 				Result.put (l_hyper.to_json, "hyperlinkDisplayType")

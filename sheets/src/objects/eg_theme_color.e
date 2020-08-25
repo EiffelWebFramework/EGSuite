@@ -67,7 +67,7 @@ feature {NONE} -- Initialization
 	accent6: INTEGER = 9
 			-- Represents the sixth accent color.
 
-	link: INTEGER = 19
+	link: INTEGER = 10
 			-- Represents the color to use for hyperlinks.
 
 feature -- Change Elements
@@ -193,7 +193,7 @@ feature -- Status Report
 			          a_value = accent3 or else
 			          a_value = accent4 or else
 			          a_value = accent5 or else
-			          a_value = accent5 or else
+			          a_value = accent6 or else
 			          a_value = link
 		end
 

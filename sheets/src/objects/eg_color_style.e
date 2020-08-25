@@ -58,7 +58,7 @@ feature -- Eiffel to JSON
 		do
 			create Result.make_empty
 			if attached rgb_color as l_rgb_color then
-
+				Result.put (l_rgb_color.to_json, "rgbColor")
 			end
 			if attached theme_color as l_theme_color then
 				Result.put (l_theme_color.to_json, "themeColor")
