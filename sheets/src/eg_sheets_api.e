@@ -146,7 +146,7 @@ feature -- Spreedsheets Operations
 			end
 		end
 
-	append_with_id (a_spreadsheet_id: attached like spreadsheet_id; a_data: detachable ARRAY[ARRAY[STRING]]): detachable like last_response.body
+	append_with_id_raw (a_spreadsheet_id: attached like spreadsheet_id; a_range, a_raw_data: STRING): detachable like last_response.body
 		note
 			EIS:"name=append.spreedsheets", "src=https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values/append", "protocol=uri"
 		require
@@ -160,14 +160,14 @@ feature -- Spreedsheets Operations
 			url_encoder: URL_ENCODER
 		do
 			l_range := ""
-			logger.write_information ("append-> spreadsheed_id:" + a_spreadsheet_id)
+			logger.write_information ("append_with_id_raw-> spreadsheed_id:" + a_spreadsheet_id)
 			-- path params
 			l_path_params_s := a_spreadsheet_id
 			l_path_params_s.append ("/values/") -- spreadsheets/{spreadsheetId}/values/{range}:append
 
 				-- TODO add url encode to the query parameters.
 			create url_encoder
-			l_path_params_s.append (url_encoder.encoded_string ("Sheet1!A1:B5")) -- range ex. A1:B2 or namedRanges TRY: Sheet1!A:A | last not null index could be: =index(J:J,max(row(J:J)*(J:J<>"")))
+			l_path_params_s.append (url_encoder.encoded_string (a_range)) -- range ex. A1:B2 or namedRanges TRY: Sheet1!A:A | last not null index could be: =index(J:J,max(row(J:J)*(J:J<>"")))
 
 			l_path_params_s.append (":append")
 			-- qry params
@@ -181,7 +181,8 @@ feature -- Spreedsheets Operations
 --			l_qry_params.extend ("SERIAL_NUMBER", "responseDateTimeRenderOption") -- SERIAL_NUMBER|FORMATTED_STRING https://developers.google.com/sheets/api/reference/rest/v4/DateTimeRenderOption
 
 
-			l_post_data := impl_append_post_data2
+			l_post_data := a_raw_data
+			logger.write_debug ("append_with_id_raw -> post data are:" + l_post_data + "-----")
 
 				-- Google API append require body parameter instead of upload data.
 			api_post_call (sheets_url ("spreadsheets/" + l_path_params_s, Void), l_qry_params, l_post_data, Void)
@@ -203,9 +204,9 @@ feature -- Spreedsheets Operations
 --					l_file.put_string (l_body)
 --					l_file.close
 				elseif l_response.status = {HTTP_STATUS_CODE}.not_found then
-					logger.write_error ("get_from_id-> Not found:" + l_response.status.out + " %NBody: " + l_body)
+					logger.write_error ("append_with_id_raw-> Not found:" + l_response.status.out + " %NBody: " + l_body)
 				else
-					logger.write_error ("get_from_id-> Status code invalid:" + l_response.status.out + " %NBody: " + l_body)
+					logger.write_error ("append_with_id_raw-> Status code invalid:" + l_response.status.out + " %NBody: " + l_body)
 				end
 			end
 		end
@@ -513,7 +514,7 @@ feature {NONE} -- Implementation
 	data_file: detachable PLAIN_TEXT_FILE
 
 
-	impl_append_post_data: TUPLE[data:PATH; content_type: STRING]
+	impl_append_post_data_sample_2: TUPLE[data:PATH; content_type: STRING]
 		require
 			not attached data_file
 		local
@@ -552,82 +553,6 @@ feature {NONE} -- Implementation
 			attached data_file
 		end
 
-	impl_append_post_data2: STRING
-		local
-			l_res: JSON_OBJECT
-			l_jsa_main,
-			l_jsa_line: JSON_ARRAY
-			j_array: JSON_ARRAY
-
---{
---  "range": string,
---  "majorDimension": enum (Dimension),
---  "values": [
---    array
---  ]
---}
---//   "values": [
---    //     [
---    //       "Item",
---    //       "Cost"
---    //     ],
---    //     [
---    //       "Wheel",
---    //       "$20.50"
---    //     ],
---    //     [
---    //       "Door",
---    //       "$15"
---    //     ],
---    //     [
---    //       "Engine",
---    //       "$100"
---    //     ],
---    //     [
---    //       "Totals",
---    //       "$135.50"
---    //     ]
---    //   ]
-
-		do
-			create l_res.make_with_capacity (5)
-			l_res.put_string ("Sheet1!A1:B5", "range")
-			l_res.put_string ("ROWS", "majorDimension") -- "DIMENSION_UNSPECIFIED", "ROWS", "COLUMNS"
-
-			create l_jsa_main.make (10)
-
-			create j_array.make (1)
-			create l_jsa_line.make (2)
-			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("Item"))
-			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("Cost"))
-			j_array.add (l_jsa_line)
-
-			create l_jsa_line.make (2)
-			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("Wheel"))
-			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("$20.50"))
-			j_array.add (l_jsa_line)
-
-			create l_jsa_line.make (2)
-			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("Door"))
-			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("$15"))
-			j_array.add (l_jsa_line)
-
-			create l_jsa_line.make (2)
-			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("Engine"))
-			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("$100"))
-			j_array.add (l_jsa_line)
-
-			create l_jsa_line.make (2)
-			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("Totals"))
-			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("$135.50"))
-			j_array.add (l_jsa_line)
-
-
-			l_res.put (j_array, "values")
-
-			Result := l_res.representation
-			logger.write_debug ("impl_append_body-> Result: '" + Result.out + "'")
-		end
 
 end
 
