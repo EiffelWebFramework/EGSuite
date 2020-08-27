@@ -23,7 +23,7 @@ feature -- {NONE}
 			retrieve_access_token
 --			test_create_sheet
 --			test_get_sheet ("1v1N4nRa6mmLcP9rUuyQPiCnLuUcBQFDEC7E0CDg3ASI")
-			test_append_sheet ("19cKCmQBWJoMePX0Iy6LueHRw0sS2bMcyP1Auzbkvj6M") --pg
+			test_append_sheet ("19cKCmQBWJoMePX0Iy6LueHRw0sS2bMcyP1Auzbkvj6M", impl_append_post_data_sample) --pg
 			--test_append_sheet ("1j5CTkpgOc6Y5qgYdA_klZYjNhmN2KYocoZAdM4Y61tw") --jv
 
 --			set_from_json_credentials_file_path (create {PATH}.make_from_string (CREDENTIALS_PATH))
@@ -106,17 +106,12 @@ feature -- Tests
 			end
 		end
 
-	test_append_sheet (an_id: attached like {EG_SHEETS_API}.spreadsheet_id)
+	test_append_sheet (an_id: attached like {EG_SHEETS_API}.spreadsheet_id; a_data: STRING)
 		local
 			l_esapi: EG_SHEETS_API
-			l_data: ARRAY[ARRAY[STRING]]
 		do
-			l_data := <<
-					<<"test1", "test2">>,
-					<<"test3", "test4">>
-				>>
 			create l_esapi.make (last_token.token)
-			if attached l_esapi.append_with_id (an_id, l_data) as l_spreedsheet_get_result then
+			if attached l_esapi.append_with_id_raw (an_id, a_data) as l_spreedsheet_get_result then
 				if l_esapi.has_error then
 --					debug ("test_create_sheet")
 						print ("test_append_sheet-> Error   %N" )
@@ -156,4 +151,84 @@ feature {NONE} -- Implementations
 
 	CREDENTIALS_PATH: STRING="credentials.json" -- get this file from https://console.developers.google.com/
 			-- Credentials path to json file.
+
+
+
+	impl_append_post_data_sample: STRING
+		local
+			l_res: JSON_OBJECT
+			l_jsa_main,
+			l_jsa_line: JSON_ARRAY
+			j_array: JSON_ARRAY
+
+--{
+--  "range": string,
+--  "majorDimension": enum (Dimension),
+--  "values": [
+--    array
+--  ]
+--}
+--//   "values": [
+--    //     [
+--    //       "Item",
+--    //       "Cost"
+--    //     ],
+--    //     [
+--    //       "Wheel",
+--    //       "$20.50"
+--    //     ],
+--    //     [
+--    //       "Door",
+--    //       "$15"
+--    //     ],
+--    //     [
+--    //       "Engine",
+--    //       "$100"
+--    //     ],
+--    //     [
+--    //       "Totals",
+--    //       "$135.50"
+--    //     ]
+--    //   ]
+
+		do
+			create l_res.make_with_capacity (5)
+			l_res.put_string ("Sheet1!A1:B5", "range")
+			l_res.put_string ("ROWS", "majorDimension") -- "DIMENSION_UNSPECIFIED", "ROWS", "COLUMNS"
+
+			create l_jsa_main.make (10)
+
+			create j_array.make (1)
+			create l_jsa_line.make (2)
+			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("Item"))
+			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("Cost"))
+			j_array.add (l_jsa_line)
+
+			create l_jsa_line.make (2)
+			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("Wheel"))
+			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("$20.50"))
+			j_array.add (l_jsa_line)
+
+			create l_jsa_line.make (2)
+			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("Door"))
+			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("$15"))
+			j_array.add (l_jsa_line)
+
+			create l_jsa_line.make (2)
+			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("Engine"))
+			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("$100"))
+			j_array.add (l_jsa_line)
+
+			create l_jsa_line.make (2)
+			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("Totals"))
+			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("$135.50"))
+			j_array.add (l_jsa_line)
+
+
+			l_res.put (j_array, "values")
+
+			Result := l_res.representation
+			logger.write_debug ("impl_append_body-> Result: '" + Result.out + "'")
+		end
+
 end
