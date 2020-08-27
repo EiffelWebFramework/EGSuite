@@ -72,12 +72,12 @@ feature -- Tests
 			end
 		end
 
-	test_get_sheet (an_id: attached like {EG_SHEETS_API}.spreadsheet_id)
+	test_get_sheet (a_sheet_id: attached like {EG_SHEETS_API}.spreadsheet_id)
 		local
 			l_esapi: EG_SHEETS_API
 		do
 			create l_esapi.make (last_token.token)
-			if attached l_esapi.get_from_id (an_id) as l_spreedsheet_get_result then
+			if attached l_esapi.get_from_id (a_sheet_id) as l_spreedsheet_get_result then
 				if l_esapi.has_error then
 --					debug ("test_create_sheet")
 						print ("test_create_sheet-> Error   %N" )
@@ -106,12 +106,12 @@ feature -- Tests
 			end
 		end
 
-	test_append_sheet (an_id: attached like {EG_SHEETS_API}.spreadsheet_id; a_data: STRING)
+	test_append_sheet (a_sheet_id: attached like {EG_SHEETS_API}.spreadsheet_id; a_data: STRING)
 		local
 			l_esapi: EG_SHEETS_API
 		do
 			create l_esapi.make (last_token.token)
-			if attached l_esapi.append_with_id_raw (an_id, a_data) as l_spreedsheet_get_result then
+			if attached l_esapi.append_with_id_raw (a_sheet_id, a_data) as l_spreedsheet_get_result then
 				if l_esapi.has_error then
 --					debug ("test_create_sheet")
 						print ("test_append_sheet-> Error   %N" )
