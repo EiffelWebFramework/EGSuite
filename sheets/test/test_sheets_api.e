@@ -112,7 +112,6 @@ feature -- Tests
 		local
 			l_esapi: EG_SHEETS_API
 			l_qry: EG_SPREADSHEET_PARAMETERS
-
 		do
 			create l_qry.make (1)
 			l_qry.include_ranges (create {ARRAYED_LIST [STRING]}.make_from_array (<<"Sheet1!A1:B1">>))
