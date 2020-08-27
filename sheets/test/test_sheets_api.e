@@ -17,8 +17,8 @@ feature -- {NONE}
 
 	make
 		do
+			-- TODO improve this code so we can select which integration test we want to run.
 			logger.write_information ("make-> ======================> Starting application")
-
 			set_from_json_credentials_file_path (create {PATH}.make_from_string ("/home/pg/data/solarity/sit-dev/etc/opt/solarity/EGSheets-itadmin-api-project-credentials.json"))
 			retrieve_access_token
 --			test_create_sheet
@@ -29,7 +29,6 @@ feature -- {NONE}
 --			set_from_json_credentials_file_path (create {PATH}.make_from_string (CREDENTIALS_PATH))
 			retrieve_access_token
 			test_get_sheet ("1v1N4nRa6mmLcP9rUuyQPiCnLuUcBQFDEC7E0CDg3ASI")
-
 		end
 
 

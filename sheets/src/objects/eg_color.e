@@ -1,30 +1,23 @@
 note
-	description: "Summary description for {EG_COLOR}."
-	author: ""
+	description: "[
+	Color
+		Represents a color in the RGBA color space.
+		
+	{
+	  "red": number,
+	  "green": number,
+	  "blue": number,
+	  "alpha": number
+	}
+
+	]"
 	date: "$Date$"
 	revision: "$Revision$"
+	EIS: "name=Color", "ssrc=https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/other#color", "protocol=uri"
 
 class
 	EG_COLOR
 
-inherit
-
-	ANY
-		redefine
-			default_create
-		end
-create
-	default_create
-
-feature {NONE} -- Access
-
-	default_create
-		do
-			red := 0.0
-			green := 0.0
-			blue := 0.0
-			alpha := 0.0
-		end
 
 feature -- Access
 
@@ -45,7 +38,7 @@ feature -- Access
 			-- If omitted, this color object is to be rendered as a solid color (as if the alpha value had been explicitly given with a value of 1.0). 		
 
 
-feature -- Change Element
+feature -- Element Change
 
 	set_red (a_val: REAL)
 		do
@@ -75,6 +68,17 @@ feature -- Change Element
 			alpha_set: alpha = a_val
 		end
 
+feature -- Eiffel to JSON
+
+	to_json: JSON_OBJECT
+			-- Json representation of current object.
+		do
+			create Result.make_with_capacity (4)
+			Result.put (create {JSON_NUMBER}.make_real (red), "red")
+			Result.put (create {JSON_NUMBER}.make_real (green), "green")
+			Result.put (create {JSON_NUMBER}.make_real (blue), "blue")
+			Result.put (create {JSON_NUMBER}.make_real (alpha), "alpha")
+		end
 
 invariant
 	red_invariant: red >= 0.0 and then red <= 1.0

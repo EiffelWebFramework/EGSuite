@@ -140,4 +140,41 @@ feature -- Change Element
 			underline_set: underline = a_underline
 		end
 
+
+feature -- Eiffel to JSON
+
+	to_json: JSON_OBJECT
+			-- JSON representation of current object
+			--		{
+			--		  "foregroundColor": {
+			--		    object (Color)
+			--		  },
+			--		  "foregroundColorStyle": {
+			--		    object (ColorStyle)
+			--		  },
+			--		  "fontFamily": string,
+			--		  "fontSize": integer,
+			--		  "bold": boolean,
+			--		  "italic": boolean,
+			--		  "strikethrough": boolean,
+			--		  "underline": boolean
+			--		}
+
+		do
+			create Result.make_empty
+			if attached foreground_color as l_color then
+				Result.put (l_color.to_json, "foregroundColor")
+			end
+			if attached foreground_color_style as l_fg_color then
+				Result.put (l_fg_color.to_json, "foregroundColorStyle")
+			end
+			if attached font_family as l_font_family then
+				Result.put (create {JSON_STRING}.make_from_string (l_font_family), "fontFamily")
+			end
+			Result.put (create {JSON_NUMBER}.make_integer (font_size),"fontSize")
+			Result.put (create {JSON_BOOLEAN}.make (bold),"bold")
+			Result.put (create {JSON_BOOLEAN}.make (italic),"italic")
+			Result.put (create {JSON_BOOLEAN}.make (strikethrough),"strikethrough")
+			Result.put (create {JSON_BOOLEAN}.make (underline),"underline")
+		end
 end

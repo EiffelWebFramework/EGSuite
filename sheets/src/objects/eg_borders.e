@@ -60,5 +60,34 @@ feature -- Access
 	right: EG_BORDER
 			-- The right border of the cell.
 
+feature -- Element Change
+
+	set_top (a_top: like top)
+		do
+			top := a_top
+		end
+
+	set_bottom (a_bottom: like bottom)
+		do
+			bottom := a_bottom
+		end
+
+	set_left (a_left: like left)
+		do
+			left := a_left
+		end
+
+	set_right (a_right: like right)
+		do
+			right := a_right
+		end
+
+
+feature -- Eiffel to JSON
+
+	to_json: JSON_OBJECT
+		do
+			create Result.make_empty
+		end
 
 end

@@ -56,6 +56,10 @@ feature {NONE} -- Initialization
 				end
 				logger.write_debug ("get_token-> token got from file")
 				file.close
+				if token.token.is_empty then
+					token := get_token_from_url
+					logger.write_debug ("get_token-> token got from url")
+				end
 			else
 				token := get_token_from_url
 				logger.write_debug ("get_token-> token got from url")

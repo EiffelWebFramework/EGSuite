@@ -94,4 +94,20 @@ feature -- Status Report
 			          a_value = bottom
 		end
 
+feature -- Eiffel to JSON
+
+	to_json: JSON_STRING
+			-- Json representation of Current.
+		do
+			if is_top then
+				Result := "TOP"
+			elseif is_middle then
+				Result := "MIDDLE"
+			elseif is_bottom then
+				Result := "BOTTOM"
+			else
+				Result := "VERTICAL_ALIGN_UNSPECIFIED"
+			end
+		end
+
 end

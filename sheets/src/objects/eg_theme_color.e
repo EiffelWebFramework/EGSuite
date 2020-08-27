@@ -14,7 +14,7 @@ note
 			ACCENT5							Represents the fifth accent color
 			ACCENT6							Represents the sixth accent color
 			LINK							Represents the color to use for hyperlinks
-	
+
 	]"
 	date: "$Date$"
 	revision: "$Revision$"
@@ -67,7 +67,7 @@ feature {NONE} -- Initialization
 	accent6: INTEGER = 9
 			-- Represents the sixth accent color.
 
-	link: INTEGER = 19
+	link: INTEGER = 10
 			-- Represents the color to use for hyperlinks.
 
 feature -- Change Elements
@@ -193,8 +193,37 @@ feature -- Status Report
 			          a_value = accent3 or else
 			          a_value = accent4 or else
 			          a_value = accent5 or else
-			          a_value = accent5 or else
+			          a_value = accent6 or else
 			          a_value = link
 		end
 
+
+feature -- Eiffel to JSON
+
+	to_json: JSON_STRING
+			-- Json representation of current object.
+		do
+			if is_text then
+				Result := "TEXT"
+			elseif is_background then
+				Result := "BACKGROUND"
+			elseif is_accent1 then
+				Result := "ACCENT1"
+			elseif is_accent2 then
+				Result := "ACCENT2"
+			elseif is_accent3 then
+				Result := "ACCENT3"
+			elseif is_accent4 then
+				Result := "ACCENT4"
+			elseif is_accent5 then
+				Result := "ACCENT5"
+			elseif is_accent6 then
+				Result := "ACCENT6"
+			elseif is_link then
+				Result := "LINK"
+			else
+				Result := "THEME_COLOR_TYPE_UNSPECIFIED"
+			end
+
+		end
 end
