@@ -105,7 +105,7 @@ feature -- Spreedsheets Operations
 			end
 		end
 
-	append_with_id_raw (a_spreadsheet_id: attached like spreadsheet_id; a_raw_data: STRING): detachable like last_response.body
+	append_with_id_raw (a_spreadsheet_id: attached like spreadsheet_id; a_range, a_raw_data: STRING): detachable like last_response.body
 		note
 			EIS:"name=append.spreedsheets", "src=https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values/append", "protocol=uri"
 		require
@@ -126,7 +126,7 @@ feature -- Spreedsheets Operations
 
 				-- TODO add url encode to the query parameters.
 			create url_encoder
-			l_path_params_s.append (url_encoder.encoded_string ("Sheet1!A1:B5")) -- range ex. A1:B2 or namedRanges TRY: Sheet1!A:A | last not null index could be: =index(J:J,max(row(J:J)*(J:J<>"")))
+			l_path_params_s.append (url_encoder.encoded_string (a_range)) -- range ex. A1:B2 or namedRanges TRY: Sheet1!A:A | last not null index could be: =index(J:J,max(row(J:J)*(J:J<>"")))
 
 			l_path_params_s.append (":append")
 			-- qry params
@@ -141,6 +141,7 @@ feature -- Spreedsheets Operations
 
 
 			l_post_data := a_raw_data
+			logger.write_debug ("append_with_id_raw -> post data are:" + l_post_data + "-----")
 
 				-- Google API append require body parameter instead of upload data.
 			api_post_call (sheets_url ("spreadsheets/" + l_path_params_s, Void), l_qry_params, l_post_data, Void)

@@ -109,9 +109,12 @@ feature -- Tests
 	test_append_sheet (a_sheet_id: attached like {EG_SHEETS_API}.spreadsheet_id; a_data: STRING)
 		local
 			l_esapi: EG_SHEETS_API
+			l_range: STRING
 		do
 			create l_esapi.make (last_token.token)
-			if attached l_esapi.append_with_id_raw (a_sheet_id, a_data) as l_spreedsheet_get_result then
+			l_range := "Sheet1" + "!A1:A"
+
+			if attached l_esapi.append_with_id_raw (a_sheet_id, l_range, a_data) as l_spreedsheet_get_result then
 				if l_esapi.has_error then
 --					debug ("test_create_sheet")
 						print ("test_append_sheet-> Error   %N" )
