@@ -299,17 +299,19 @@ feature {NONE} -- JSON To Eiffel
 			-- Create an object `EG_COLOR` from a json rerpesentation `a_json`.
 		do
 			create Result
-			if attached real_value_from_json (a_json, "red") as l_val then
-				Result.set_red (l_val)
-			end
-			if attached real_value_from_json (a_json, "green") as l_val then
-				Result.set_green (l_val)
-			end
-			if attached real_value_from_json (a_json, "blue") as l_val then
-				Result.set_blue (l_val)
-			end
-			if attached real_value_from_json (a_json, "alpha") as l_val then
-				Result.set_alpha (l_val)
+			if not a_json.is_empty then
+				if attached color_value_from_json (a_json, "red") as l_val then
+					Result.set_red (l_val)
+				end
+				if attached color_value_from_json (a_json, "green") as l_val then
+					Result.set_green (l_val)
+				end
+				if attached color_value_from_json (a_json, "blue") as l_val then
+					Result.set_blue (l_val)
+				end
+				if attached color_value_from_json (a_json, "alpha") as l_val then
+					Result.set_alpha (l_val)
+				end
 			end
 		end
 
@@ -636,6 +638,21 @@ feature {NONE} -- Implementation
 					obj.forth
 				end
 			end
+		end
+
+	color_value_from_json (a_json_data: detachable JSON_VALUE; a_id: STRING): REAL
+		do
+			if
+				attached {JSON_NUMBER} json_value (a_json_data, a_id) as v and then
+				v.numeric_type = v.real_type
+			then
+				Result := v.item.to_real
+			elseif attached {JSON_NUMBER} json_value (a_json_data, a_id) as v and then
+				v.numeric_type = v.integer_type
+			then
+				Result := v.item.to_integer
+			end
+
 		end
 
 	integer_value_from_json (a_json_data: detachable JSON_VALUE; a_id: STRING): INTEGER

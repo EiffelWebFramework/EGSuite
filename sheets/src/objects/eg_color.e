@@ -18,6 +18,22 @@ note
 class
 	EG_COLOR
 
+inherit
+
+	ANY
+		redefine
+			default_create
+		end
+
+create
+	default_create
+
+feature {NONE} -- Initialization
+
+	default_create
+		do
+			is_default := True
+		end
 
 feature -- Access
 
@@ -37,35 +53,57 @@ feature -- Access
 			-- This uses a wrapper message rather than a simple float scalar so that it is possible to distinguish between a default value and the value being unset.
 			-- If omitted, this color object is to be rendered as a solid color (as if the alpha value had been explicitly given with a value of 1.0). 		
 
+	is_default: BOOLEAN
+			-- Are the attributes in default values?
+
 
 feature -- Element Change
 
 	set_red (a_val: REAL)
+			-- Set `red` to `a_val`.
 		do
+			is_default := False
 			red := a_val
 		ensure
+			not_default: not is_default
 			red_set: red = a_val
 		end
 
 	set_green (a_val: REAL)
 		do
+			is_default := False
 			green := a_val
 		ensure
+			not_default: not is_default
 			green_set: green = a_val
 		end
 
 	set_blue (a_val: REAL)
 		do
+			is_default := False
 			blue := a_val
 		ensure
+			not_default: not is_default
 			blue_set: blue = a_val
 		end
 
 	set_alpha (a_val: REAL)
 		do
+			is_default := False
 			alpha := a_val
 		ensure
+			not_default: not is_default
 			alpha_set: alpha = a_val
+		end
+
+	reset
+			-- Reset the attributes to default values.
+		do
+			is_default := True
+			red := 0
+			green := 0
+			blue := 0
+			alpha := 0
 		end
 
 feature -- Eiffel to JSON
@@ -73,11 +111,15 @@ feature -- Eiffel to JSON
 	to_json: JSON_OBJECT
 			-- Json representation of current object.
 		do
-			create Result.make_with_capacity (4)
-			Result.put (create {JSON_NUMBER}.make_real (red), "red")
-			Result.put (create {JSON_NUMBER}.make_real (green), "green")
-			Result.put (create {JSON_NUMBER}.make_real (blue), "blue")
-			Result.put (create {JSON_NUMBER}.make_real (alpha), "alpha")
+			if is_default then
+				create Result.make
+			else
+				create Result.make_with_capacity (4)
+				Result.put (create {JSON_NUMBER}.make_real (red), "red")
+				Result.put (create {JSON_NUMBER}.make_real (green), "green")
+				Result.put (create {JSON_NUMBER}.make_real (blue), "blue")
+				Result.put (create {JSON_NUMBER}.make_real (alpha), "alpha")
+			end
 		end
 
 invariant
