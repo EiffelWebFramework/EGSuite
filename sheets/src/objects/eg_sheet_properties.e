@@ -159,24 +159,7 @@ feature -- Element Change
 feature -- Eiffel to JSON
 
 	to_json: JSON_OBJECT
---	{
---		  "sheetId": integer,
---		  "title": string,
---		  "index": integer,
---		  "sheetType": enum (SheetType),
---		  "gridProperties": {
---		    object (GridProperties)
---		  },
---		  "hidden": boolean,
---		  "tabColor": {
---		    object (Color)
---		  },
---		  "tabColorStyle": {
---		    object (ColorStyle)
---		  },
---		  "rightToLeft": boolean
---		}	
-
+			-- JSON Representation of current object.
 		do
 			create Result.make
 			if is_sheet_id_set then
