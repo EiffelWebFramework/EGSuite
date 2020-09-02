@@ -28,37 +28,13 @@ note
 class
 	EG_SHEET_PROPERTIES
 
-inherit
-
-	ANY
-		redefine
-			default_create
-		end
-
-create
-	default_create
-
-feature {NONE} -- Initialization
-
-	default_create
-		do
-			create title.make_empty
-			create sheet_type
-			create grid_properties
-		ensure then
-			sheet_id = 0
-			not is_sheet_id_set
-			not is_sheet_type_set
-		end
-
-
 feature -- Access
 
 	sheet_id: INTEGER
 			-- The ID of the sheet. Must be non-negative. This field cannot be changed once set.
 			-- NATURAL?
 
-	title: STRING
+	title: detachable STRING
 			-- The name of the sheet.
 
 	index: INTEGER
@@ -68,10 +44,10 @@ feature -- Access
 			-- For example, if there were 3 sheets (S1, S2, S3) in order to move S1 ahead of S2 the index would have to be set to 2.
 			-- A sheet index update request is ignored if the requested index is identical to the sheets current index or if the requested new index is equal to the current sheet index + 1.
 
-	sheet_type: EG_SHEET_TYPE
+	sheet_type: detachable EG_SHEET_TYPE
 			-- The type of sheet. Defaults to GRID . This field cannot be changed once set.
 
-	grid_properties: EG_GRID_PROPERTIES
+	grid_properties: detachable EG_GRID_PROPERTIES
 			-- Additional properties of the sheet if this sheet is a grid.
 			-- (If the sheet is an object sheet, containing a chart or image, then this field will be absent.)
 			-- When writing it is an error to set any grid properties on non-grid sheets.
@@ -100,6 +76,7 @@ feature -- Status Report
 feature -- Element Change
 
 	set_sheet_id (a_id:  like sheet_id)
+			-- Set `sheet_id` with `a_id`.
 		require
 			non_negative: a_id >=0
 			not_id_set: not is_sheet_id_set
@@ -111,7 +88,8 @@ feature -- Element Change
 			is_defined: is_sheet_id_set
 		end
 
-	set_title (a_title: STRING)
+	set_title (a_title: like title)
+			-- Set `title` with `a_title`.
 		do
 			title := a_title
 		ensure
@@ -119,6 +97,7 @@ feature -- Element Change
 		end
 
 	set_index (a_index: like index)
+			-- Set `index` with `a_index`.
 		do
 			index := a_index
 		ensure
@@ -126,6 +105,7 @@ feature -- Element Change
 		end
 
 	set_sheet_type (a_type: EG_SHEET_TYPE)
+			-- Set `sheet_type` with `a_type`.
 		require
 			not_sheet_type: not is_sheet_type_set
 		do
@@ -137,6 +117,7 @@ feature -- Element Change
 		end
 
 	set_grid_properties (a_properties: like grid_properties)
+			-- Set `grid_properties` with `a_properties`.
 		do
 			grid_properties := a_properties
 		ensure
@@ -144,6 +125,7 @@ feature -- Element Change
 		end
 
 	set_hidden (a_val: BOOLEAN)
+			-- Set `hidden` with `a_val`.
 		do
 			hidden := a_val
 		ensure
@@ -151,6 +133,7 @@ feature -- Element Change
 		end
 
 	set_tab_color (a_color: like tab_color)
+			-- Set `tab_color` with `a_color`.
 		do
 			tab_color := a_color
 		ensure
@@ -158,6 +141,7 @@ feature -- Element Change
 		end
 
 	set_tab_color_style (a_color_style: like tab_color_style)
+			-- Set `tab_color_style` with `a_color_style`.
 		do
 			tab_color_style := a_color_style
 		ensure
@@ -165,10 +149,57 @@ feature -- Element Change
 		end
 
 	set_right_to_left (a_val: BOOLEAN)
+			-- Set `right_to_left` with `a_val`.
 		do
 			right_to_left := a_val
 		ensure
 			right_to_left_set: right_to_left = a_val
+		end
+
+feature -- Eiffel to JSON
+
+	to_json: JSON_OBJECT
+--	{
+--		  "sheetId": integer,
+--		  "title": string,
+--		  "index": integer,
+--		  "sheetType": enum (SheetType),
+--		  "gridProperties": {
+--		    object (GridProperties)
+--		  },
+--		  "hidden": boolean,
+--		  "tabColor": {
+--		    object (Color)
+--		  },
+--		  "tabColorStyle": {
+--		    object (ColorStyle)
+--		  },
+--		  "rightToLeft": boolean
+--		}	
+
+		do
+			create Result.make
+			if is_sheet_id_set then
+				Result.put (create {JSON_NUMBER}.make_integer (sheet_id), "sheetId")
+			end
+			if attached title as l_title then
+				Result.put (create {JSON_STRING}.make_from_string (l_title), "title")
+			end
+			Result.put (create {JSON_NUMBER}.make_integer (index), "index")
+			if attached sheet_type as l_st then
+				Result.put (l_st.to_json, "sheetType")
+			end
+			if attached grid_properties as l_gp then
+				Result.put (l_gp.to_json, "gridProperties")
+			end
+			Result.put (create {JSON_BOOLEAN}.make (hidden), "hidden")
+			if attached tab_color as l_tc then
+				Result.put (l_tc.to_json, "tabColor")
+			end
+			if attached tab_color_style as l_tcs then
+				Result.put (l_tcs.to_json, "tabColorStyle")
+			end
+			Result.put (create {JSON_BOOLEAN}.make (right_to_left), "rightToLeft")
 		end
 
 end

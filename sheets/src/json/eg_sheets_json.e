@@ -47,7 +47,7 @@ feature -- Post
 			end
 		end
 
-feature -- 	Get
+feature -- Get
 
 	get_from_id (a_spreadsheet_id: STRING_8; a_params: detachable EG_SPREADSHEET_PARAMETERS): detachable EG_SPREADSHEET
 		note
@@ -460,6 +460,9 @@ feature {NONE} -- JSON To Eiffel
 
 	sheet_properties (a_json: JSON_VALUE): EG_SHEET_PROPERTIES
 			-- Create an object `EG_SHEET_PROPERTIES` from a json representation `a_json`.
+		local
+			l_stype: EG_SHEET_TYPE
+			l_grid_prop: EG_GRID_PROPERTIES
 		do
 			create Result
 			if attached integer_value_from_json (a_json, "sheetId") as l_sheetId then
@@ -472,19 +475,23 @@ feature {NONE} -- JSON To Eiffel
 				Result.set_index (l_index)
 			end
 			if attached string_value_from_json (a_json, "sheetType") as l_sheet_type then
+				create l_stype
 				if l_sheet_type.is_case_insensitive_equal ("GRID") then
-					Result.sheet_type.set_grid
+					l_stype.set_grid
 				elseif l_sheet_type.is_case_insensitive_equal ("OBJECT") then
-					Result.sheet_type.set_grid
+					l_stype.set_grid
 				end
+				Result.set_sheet_type (l_stype)
 			end
 			if attached {JSON_OBJECT} json_value (a_json, "gridProperties") as l_grid_properties then
+				create l_grid_prop
 				if attached integer_value_from_json (l_grid_properties, "rowCount") as l_row_count then
-					Result.grid_properties.set_row_count (l_row_count)
+					l_grid_prop.set_row_count (l_row_count)
 				end
 				if attached integer_value_from_json (l_grid_properties, "columnCount") as l_column_count then
-					Result.grid_properties.set_column_count (l_column_count)
+					l_grid_prop.set_column_count (l_column_count)
 				end
+				Result.set_grid_properties (l_grid_prop)
 			end
 			if attached boolean_value_from_json (a_json, "hidden") as l_hidden then
 				Result.set_hidden (l_hidden)

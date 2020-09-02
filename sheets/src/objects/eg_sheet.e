@@ -378,7 +378,12 @@ feature -- Element Change
 feature -- Eiffel to JSON
 
 	to_json: JSON_OBJECT
+			-- Json representation of current object.	
 		do
 			create Result.make_empty
+			if attached properties as l_properties then
+				Result.put (l_properties.to_json, "properties")
+			end
+
 		end
 end
