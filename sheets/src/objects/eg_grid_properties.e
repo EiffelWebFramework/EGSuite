@@ -103,4 +103,18 @@ feature -- Element change
 			row_count_assigned: row_count = a_row_count
 		end
 
+feature -- Eiffel to JSON
+
+	to_json: JSON_OBJECT
+			-- JSon representation of current object.
+		do
+			create Result.make_with_capacity (6)
+			Result.put (create {JSON_NUMBER}.make_integer (row_count), "rowCount")
+			Result.put (create {JSON_NUMBER}.make_integer (column_count), "columnCount")
+			Result.put (create {JSON_NUMBER}.make_integer (frozen_row_count), "frozenRowCount")
+			Result.put (create {JSON_NUMBER}.make_integer (frozen_column_count), "frozenColumnCount")
+			Result.put (create {JSON_BOOLEAN}.make (hide_grid_lines), "hideGridlines")
+			Result.put (create {JSON_BOOLEAN}.make (row_group_control_after), "rowGroupControlAfter")
+			Result.put (create {JSON_BOOLEAN}.make (column_group_control_after), "columnGroupControlAfter")
+		end
 end

@@ -47,7 +47,7 @@ feature -- Post
 			end
 		end
 
-feature -- 	Get
+feature -- Get
 
 	get_from_id (a_spreadsheet_id: STRING_8; a_params: detachable EG_SPREADSHEET_PARAMETERS): detachable EG_SPREADSHEET
 		note
@@ -299,17 +299,19 @@ feature {NONE} -- JSON To Eiffel
 			-- Create an object `EG_COLOR` from a json rerpesentation `a_json`.
 		do
 			create Result
-			if attached real_value_from_json (a_json, "red") as l_val then
-				Result.set_red (l_val)
-			end
-			if attached real_value_from_json (a_json, "green") as l_val then
-				Result.set_green (l_val)
-			end
-			if attached real_value_from_json (a_json, "blue") as l_val then
-				Result.set_blue (l_val)
-			end
-			if attached real_value_from_json (a_json, "alpha") as l_val then
-				Result.set_alpha (l_val)
+			if not a_json.is_empty then
+				if attached color_value_from_json (a_json, "red") as l_val then
+					Result.set_red (l_val)
+				end
+				if attached color_value_from_json (a_json, "green") as l_val then
+					Result.set_green (l_val)
+				end
+				if attached color_value_from_json (a_json, "blue") as l_val then
+					Result.set_blue (l_val)
+				end
+				if attached color_value_from_json (a_json, "alpha") as l_val then
+					Result.set_alpha (l_val)
+				end
 			end
 		end
 
@@ -404,7 +406,9 @@ feature {NONE} -- JSON To Eiffel
 				Result.set_properties (sheet_properties (l_properties))
 			end
 			if attached {JSON_ARRAY} json_value (a_json, "data") as l_data then
-					-- TODO
+					across l_data as ic loop
+						Result.force_data (eg_data_grid (ic.item))
+					end
 			end
 			if attached {JSON_ARRAY} json_value (a_json, "merges") as l_merges then
 					-- TODO
@@ -441,6 +445,41 @@ feature {NONE} -- JSON To Eiffel
 			end
 		end
 
+	eg_data_grid (a_json: JSON_VALUE): EG_GRID_DATA
+			-- Create an object `EG_GRID_DATA` from a json representation.
+		do
+			create Result
+			if attached integer_value_from_json (a_json, "startRow") as l_val then
+				Result.set_start_row (l_val)
+			end
+			if attached integer_value_from_json (a_json, "startColumn") as l_val  then
+				Result.set_start_column (l_val)
+			end
+			if attached {JSON_ARRAY} json_value (a_json, "rowData") as l_data  then
+				across l_data as ic loop
+					Result.force_row_data (eg_row_data (ic.item))
+				end
+			end
+		end
+
+	eg_row_data (a_json: JSON_VALUE): EG_ROW_DATA
+			-- Create an object `EG_ROW_DATA` from a json representation.
+		do
+			create Result
+			if attached {JSON_ARRAY} json_value (a_json, "values") as l_data  then
+				across l_data as ic loop
+					Result.force_value(eg_cell_data (ic.item))
+				end
+			end
+		end
+
+	eg_cell_data (a_json: JSON_VALUE): EG_CELL_DATA
+			-- Create an object `EG_CELL_DATA` from a json representation.
+		do
+			create Result
+			
+		end
+
 	eg_named_ranges (a_json: JSON_VALUE): EG_NAMED_RANGE
 			-- Create an object `EG_NAMED_RANGE` from a json representation.
 		do
@@ -458,6 +497,9 @@ feature {NONE} -- JSON To Eiffel
 
 	sheet_properties (a_json: JSON_VALUE): EG_SHEET_PROPERTIES
 			-- Create an object `EG_SHEET_PROPERTIES` from a json representation `a_json`.
+		local
+			l_stype: EG_SHEET_TYPE
+			l_grid_prop: EG_GRID_PROPERTIES
 		do
 			create Result
 			if attached integer_value_from_json (a_json, "sheetId") as l_sheetId then
@@ -470,19 +512,23 @@ feature {NONE} -- JSON To Eiffel
 				Result.set_index (l_index)
 			end
 			if attached string_value_from_json (a_json, "sheetType") as l_sheet_type then
+				create l_stype
 				if l_sheet_type.is_case_insensitive_equal ("GRID") then
-					Result.sheet_type.set_grid
+					l_stype.set_grid
 				elseif l_sheet_type.is_case_insensitive_equal ("OBJECT") then
-					Result.sheet_type.set_grid
+					l_stype.set_grid
 				end
+				Result.set_sheet_type (l_stype)
 			end
 			if attached {JSON_OBJECT} json_value (a_json, "gridProperties") as l_grid_properties then
+				create l_grid_prop
 				if attached integer_value_from_json (l_grid_properties, "rowCount") as l_row_count then
-					Result.grid_properties.set_row_count (l_row_count)
+					l_grid_prop.set_row_count (l_row_count)
 				end
 				if attached integer_value_from_json (l_grid_properties, "columnCount") as l_column_count then
-					Result.grid_properties.set_column_count (l_column_count)
+					l_grid_prop.set_column_count (l_column_count)
 				end
+				Result.set_grid_properties (l_grid_prop)
 			end
 			if attached boolean_value_from_json (a_json, "hidden") as l_hidden then
 				Result.set_hidden (l_hidden)
@@ -636,6 +682,21 @@ feature {NONE} -- Implementation
 					obj.forth
 				end
 			end
+		end
+
+	color_value_from_json (a_json_data: detachable JSON_VALUE; a_id: STRING): REAL
+		do
+			if
+				attached {JSON_NUMBER} json_value (a_json_data, a_id) as v and then
+				v.numeric_type = v.real_type
+			then
+				Result := v.item.to_real
+			elseif attached {JSON_NUMBER} json_value (a_json_data, a_id) as v and then
+				v.numeric_type = v.integer_type
+			then
+				Result := v.item.to_integer
+			end
+
 		end
 
 	integer_value_from_json (a_json_data: detachable JSON_VALUE; a_id: STRING): INTEGER

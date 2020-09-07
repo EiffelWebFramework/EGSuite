@@ -378,7 +378,83 @@ feature -- Element Change
 feature -- Eiffel to JSON
 
 	to_json: JSON_OBJECT
+			-- Json representation of current object.
+		local
+			j_array: JSON_ARRAY
 		do
 			create Result.make_empty
+			if attached properties as l_properties then
+				Result.put (l_properties.to_json, "properties")
+			end
+			if attached data as l_data then
+				create j_array.make (l_data.count)
+				across l_data as ic loop
+					j_array.add (ic.item.to_json)
+				end
+				Result.put (j_array, "data")
+			end
+
 		end
+
+--		  "data": [
+--		    {
+--		      object (GridData)
+--		    }
+--		  ],
+--		  "merges": [
+--		    {
+--		      object (GridRange)
+--		    }
+--		  ],
+--		  "conditionalFormats": [
+--		    {
+--		      object (ConditionalFormatRule)
+--		    }
+--		  ],
+--		  "filterViews": [
+--		    {
+--		      object (FilterView)
+--		    }
+--		  ],
+--		  "protectedRanges": [
+--		    {
+--		      object (ProtectedRange)
+--		    }
+--		  ],
+--		  "basicFilter": {
+--		    object (BasicFilter)
+--		  },
+--		  "charts": [
+--		    {
+--		      object (EmbeddedChart)
+--		    }
+--		  ],
+--		  "bandedRanges": [
+--		    {
+--		      object (BandedRange)
+--		    }
+--		  ],
+--		  "developerMetadata": [
+--		    {
+--		      object (DeveloperMetadata)
+--		    }
+--		  ],
+--		  "rowGroups": [
+--		    {
+--		      object (DimensionGroup)
+--		    }
+--		  ],
+--		  "columnGroups": [
+--		    {
+--		      object (DimensionGroup)
+--		    }
+--		  ],
+--		  "slicers": [
+--		    {
+--		      object (Slicer)
+--		    }
+--		  ]
+--		}
+
+
 end

@@ -74,7 +74,22 @@ feature -- Status Report
 		do
 			Result := a_value = sheet_type_unspecified or else
 			          a_value = grid or else
-			          a_value = object 
+			          a_value = object
+		end
+
+
+feature -- Eiffel to JSON
+
+	to_json: JSON_STRING
+			-- JSon representation of current object.
+		do
+			if is_grid then
+				Result := "GRID"
+			elseif is_object then
+				Result := "OBJECT"
+			else
+				Result := "SHEET_TYPE_UNSPECIFIED"
+			end
 		end
 
 end
