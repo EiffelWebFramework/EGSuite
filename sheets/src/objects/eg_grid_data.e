@@ -68,7 +68,7 @@ feature -- Element Change
 			start_column_set: start_column = a_val
 		end
 
-	force_raw_data (a_data: EG_ROW_DATA)
+	force_row_data (a_data: EG_ROW_DATA)
 			-- Add an item `a_data` to the list of `row_data`
 		local
 			l_row_data: like row_data
@@ -81,6 +81,14 @@ feature -- Element Change
 				l_row_data.force (a_data)
 			end
 			row_data := l_row_data
+		end
+
+	set_row_data (a_data: like row_data)
+			-- Set `row_data` with `a_data`.
+		do
+			row_data := a_data
+		ensure
+			row_data_set: row_data = a_data
 		end
 
 	force_row_metadata (a_metadata: EG_DIMENSION_PROPERTIES)
@@ -96,6 +104,14 @@ feature -- Element Change
 				l_row_metadata.force (a_metadata)
 			end
 			row_metadata := l_row_metadata
+		end
+
+	set_row_metadata (a_data: like row_metadata)
+			-- Set `row_metadata` with `a_data`.
+		do
+			row_metadata := a_data
+		ensure
+			row_metadata_set: row_metadata = a_data
 		end
 
 
@@ -114,10 +130,45 @@ feature -- Element Change
 			column_metadata := l_column_metadata
 		end
 
+	set_column_metadata	(a_data: like column_metadata)
+			-- Set `column_metadata` with `a_data`.
+		do
+			column_metadata := a_data
+		ensure
+			column_metadata_set: column_metadata = a_data
+		end
+
 feature -- Eiffel to JSON
 
 	to_json: JSON_OBJECT
+			--Json representation of the current object.
+		local
+			j_array: JSON_ARRAY
 		do
-			create Result.make
+			create Result.make_empty
+			Result.put (create {JSON_NUMBER}.make_integer (start_row), "startRow")
+			Result.put (create {JSON_NUMBER}.make_integer (start_column), "startColumn")
+			if attached row_data as l_rd then
+				create j_array.make (l_rd.count)
+				across l_rd as ic  loop
+					j_array.add (ic.item.to_json)
+				end
+				Result.put (j_array, "rowData")
+			end
+			if attached row_metadata as l_rm then
+				create j_array.make (l_rm.count)
+				across l_rm as ic loop
+					j_array.add (ic.item.to_json)
+				end
+				Result.put (j_array, "rowMetadata")
+			end
+			if attached column_metadata as l_cm then
+				create j_array.make (l_cm.count)
+				across l_cm as ic loop
+					j_array.add (ic.item.to_json)
+				end
+				Result.put (j_array, "columnMetadata")
+			end
+
 		end
 end

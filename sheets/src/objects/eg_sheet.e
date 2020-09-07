@@ -395,4 +395,66 @@ feature -- Eiffel to JSON
 			end
 
 		end
+
+--		  "data": [
+--		    {
+--		      object (GridData)
+--		    }
+--		  ],
+--		  "merges": [
+--		    {
+--		      object (GridRange)
+--		    }
+--		  ],
+--		  "conditionalFormats": [
+--		    {
+--		      object (ConditionalFormatRule)
+--		    }
+--		  ],
+--		  "filterViews": [
+--		    {
+--		      object (FilterView)
+--		    }
+--		  ],
+--		  "protectedRanges": [
+--		    {
+--		      object (ProtectedRange)
+--		    }
+--		  ],
+--		  "basicFilter": {
+--		    object (BasicFilter)
+--		  },
+--		  "charts": [
+--		    {
+--		      object (EmbeddedChart)
+--		    }
+--		  ],
+--		  "bandedRanges": [
+--		    {
+--		      object (BandedRange)
+--		    }
+--		  ],
+--		  "developerMetadata": [
+--		    {
+--		      object (DeveloperMetadata)
+--		    }
+--		  ],
+--		  "rowGroups": [
+--		    {
+--		      object (DimensionGroup)
+--		    }
+--		  ],
+--		  "columnGroups": [
+--		    {
+--		      object (DimensionGroup)
+--		    }
+--		  ],
+--		  "slicers": [
+--		    {
+--		      object (Slicer)
+--		    }
+--		  ]
+--		}
+
+
 end

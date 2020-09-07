@@ -406,7 +406,9 @@ feature {NONE} -- JSON To Eiffel
 				Result.set_properties (sheet_properties (l_properties))
 			end
 			if attached {JSON_ARRAY} json_value (a_json, "data") as l_data then
-					-- TODO
+					across l_data as ic loop
+						Result.force_data (eg_data_grid (ic.item))
+					end
 			end
 			if attached {JSON_ARRAY} json_value (a_json, "merges") as l_merges then
 					-- TODO
@@ -441,6 +443,41 @@ feature {NONE} -- JSON To Eiffel
 			if attached {JSON_ARRAY} json_value (a_json, "slicers") as l_slicers then
 					-- TODO
 			end
+		end
+
+	eg_data_grid (a_json: JSON_VALUE): EG_GRID_DATA
+			-- Create an object `EG_GRID_DATA` from a json representation.
+		do
+			create Result
+			if attached integer_value_from_json (a_json, "startRow") as l_val then
+				Result.set_start_row (l_val)
+			end
+			if attached integer_value_from_json (a_json, "startColumn") as l_val  then
+				Result.set_start_column (l_val)
+			end
+			if attached {JSON_ARRAY} json_value (a_json, "rowData") as l_data  then
+				across l_data as ic loop
+					Result.force_row_data (eg_row_data (ic.item))
+				end
+			end
+		end
+
+	eg_row_data (a_json: JSON_VALUE): EG_ROW_DATA
+			-- Create an object `EG_ROW_DATA` from a json representation.
+		do
+			create Result
+			if attached {JSON_ARRAY} json_value (a_json, "values") as l_data  then
+				across l_data as ic loop
+					Result.force_value(eg_cell_data (ic.item))
+				end
+			end
+		end
+
+	eg_cell_data (a_json: JSON_VALUE): EG_CELL_DATA
+			-- Create an object `EG_CELL_DATA` from a json representation.
+		do
+			create Result
+			
 		end
 
 	eg_named_ranges (a_json: JSON_VALUE): EG_NAMED_RANGE
