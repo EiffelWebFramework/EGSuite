@@ -76,7 +76,7 @@ feature -- Tests
 			l_esapi: EG_SHEETS_API
 		do
 			create l_esapi.make (last_token.token)
-			if attached l_esapi.get_from_id (a_sheet_id) as l_spreedsheet_get_result then
+			if attached l_esapi.get_from_id (a_sheet_id, Void) as l_spreedsheet_get_result then
 				if l_esapi.has_error then
 --					debug ("test_create_sheet")
 						print ("test_create_sheet-> Error   %N" )
