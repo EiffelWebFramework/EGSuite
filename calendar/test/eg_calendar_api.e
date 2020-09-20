@@ -63,7 +63,11 @@ create
 	end
 
 
-	feature create_calendar_event( name_of_calendar : STRING; title_of_event : STRING) : detachable STRING
+	feature create_calendar_event( name_of_calendar : STRING; payload : CALENDAR_EVENT_PAYLOAD) : detachable STRING
+	require
+		start_date_exists: attached payload.start
+		ending_date_exists: attached payload.ending
+
 	do
 		api_post_call ("https://www.googleapis.com/calendar/v3/calendars/" + name_of_calendar  + "/events", Void , payload_create_calendar_event, Void)
 		if
