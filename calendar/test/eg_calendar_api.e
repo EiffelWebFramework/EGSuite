@@ -52,13 +52,20 @@ create
 	end
 
 	feature create_calendar( name_of_calendar : STRING) : detachable STRING
-	local
-		parameter_table : STRING_TABLE[STRING]
-
 	do
-		create parameter_table.make (1)
-		parameter_table.put (name_of_calendar,"summary")
-		api_post_call ("https://www.googleapis.com/calendar/v3/calendars" , parameter_table , payload_create_calendar, Void)
+		api_post_call ("https://www.googleapis.com/calendar/v3/calendars" , Void , payload_create_calendar, Void)
+		if
+			attached last_response as l_response and then
+			attached l_response.body as l_body
+		then
+			Result := l_body
+		end
+	end
+
+
+	feature create_calendar_event( name_of_calendar : STRING; title_of_event : STRING) : detachable STRING
+	do
+		api_post_call ("https://www.googleapis.com/calendar/v3/calendars/" + name_of_calendar  + "/events", Void , payload_create_calendar_event, Void)
 		if
 			attached last_response as l_response and then
 			attached l_response.body as l_body
@@ -81,6 +88,35 @@ create
 		do
 			create l_res.make_with_capacity (5)
 			l_res.put_string ("BSharpABTODO", "summary")
+			Result := l_res.representation
+		end
+
+
+	payload_create_calendar_event: STRING
+		note
+			EIS:"name=calendar event", "src=https://developers.google.com/calendar/v3/reference/events#resource"
+		local
+			l_res: JSON_OBJECT
+		do
+
+			create l_res.make_with_capacity (5)
+			-- Add the required parameters in the paylod: "start" and "end"
+			--https://developers.google.com/calendar/v3/reference/events/insert
+
+--  "start": {
+--    "date": date,
+--    "dateTime": datetime,
+--    "timeZone": string
+--  },
+--  "end": {
+--    "date": date,
+--    "dateTime": datetime,
+--    "timeZone": string
+--  }
+
+
+	--?????????????
+
 			Result := l_res.representation
 		end
 

@@ -29,10 +29,13 @@ feature -- {NONE}
 			retrieve_access_token
 
 			test_list_calendars
-			test_create_calendar
+--			test_create_calendar
 --			test_list_primary_calendar
 --			test_list_primary_calendar_events
-			test_list_calendars
+--			test_list_calendars
+
+
+
 
 		end
 
