@@ -85,7 +85,7 @@ feature {NONE} -- Initialization
 				create Result.make_empty
 				create config.make_default (l_api_key, l_api_secret)
 				config.set_callback ("urn:ietf:wg:oauth:2.0:oob")
-				config.set_scope ("https://www.googleapis.com/auth/spreadsheets")
+				config.set_scope ( google_auth_path_path_s )
 				create google
 				api_service := google.create_service (config)
 				logger.write_debug ("%N===Google OAuth Workflow ===%N")
@@ -154,7 +154,16 @@ feature {NONE} -- Initialization
 
 feature -- Access
 
-	Token_file_path_s: STRING = "token.access"
+	Token_file_path_s: STRING
+	do
+		Result := "token.access"
+	end
+
+	google_auth_path_path_s: STRING
+	do
+		Result := "https://www.googleapis.com/auth/spreadsheets"
+	end
+
 
 feature -- Status Setting
 

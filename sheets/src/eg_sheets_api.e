@@ -62,7 +62,7 @@ feature -- Spreedsheets Operations
 			then
 				Result := l_body
 			end
-		end
+	end
 
 	get_from_id (a_spreadsheet_id: attached like spreadsheet_id; a_params: detachable EG_SPREADSHEET_PARAMETERS): detachable like last_response.body
 			-- POST /spreadsheets/`a_spreadsheet_id'
@@ -402,7 +402,7 @@ feature {NONE} -- Implementation
 		require
 			a_query_attached: a_query /= Void
 		do
-			create 	Result.make_from_string (endpooint_sheets_url)
+			create 	Result.make_from_string (endpoint_sheets_url)
 			Result.append ("/")
 			Result.append (version)
 			Result.append ("/")
@@ -506,8 +506,10 @@ feature {NONE} -- Implementation
 
 feature -- Service Endpoint
 
-	endpooint_sheets_url: STRING  = "https://sheets.googleapis.com"
-			--  base URL that specifies the network address of an API service.
+	endpoint_sheets_url: STRING
+	do
+		Result := "https://sheets.googleapis.com" 			--  base URL that specifies the network address of an API service.
+	end
 
 feature {NONE} -- Implementation
 

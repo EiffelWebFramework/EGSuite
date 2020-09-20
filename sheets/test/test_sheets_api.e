@@ -10,6 +10,7 @@ inherit
 
 	APPLICATION_FLOW
 
+
 create
 	make
 
@@ -20,13 +21,14 @@ feature -- {NONE}
 			-- TODO improve this code so we can select which integration test we want to run.
 			logger.write_information ("make-> ======================> Starting application")
 			set_from_json_credentials_file_path (create {PATH}.make_from_string (credentials_path))
+
 			retrieve_access_token
 			test_create_sheet
 ----			test_get_sheet ("1v1N4nRa6mmLcP9rUuyQPiCnLuUcBQFDEC7E0CDg3ASI")
---			test_append_sheet ("19cKCmQBWJoMePX0Iy6LueHRw0sS2bMcyP1Auzbkvj6M", impl_append_post_data_sample) --pg
+			test_append_sheet ("19cKCmQBWJoMePX0Iy6LueHRw0sS2bMcyP1Auzbkvj6M", impl_append_post_data_sample) --pg
 --			--test_append_sheet ("1j5CTkpgOc6Y5qgYdA_klZYjNhmN2KYocoZAdM4Y61tw") --jv
 
-----			set_from_json_credentials_file_path (create {PATH}.make_from_string (CREDENTIALS_PATH))
+----		set_from_json_credentials_file_path (create {PATH}.make_from_string (CREDENTIALS_PATH))
 --			retrieve_access_token
 --			test_get_sheet ("1v1N4nRa6mmLcP9rUuyQPiCnLuUcBQFDEC7E0CDg3ASI")
 		end
@@ -34,7 +36,8 @@ feature -- {NONE}
 
 feature -- Tests
 
-	test_create_sheet
+
+		test_create_sheet
 		require
 			token_is_valid
 		local
@@ -151,9 +154,8 @@ feature -- Tests
 
 feature {NONE} -- Implementations
 
-	CREDENTIALS_PATH: STRING="credentials.json" -- get this file from https://console.developers.google.com/
+	CREDENTIALS_PATH: STRING="credentials.json"  -- get this file from https://console.developers.google.com/
 			-- Credentials path to json file.
-
 
 
 	impl_append_post_data_sample: STRING
