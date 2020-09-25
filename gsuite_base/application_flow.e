@@ -11,7 +11,6 @@ inherit
 
 	LOGGABLE
 
-
 feature {NONE} -- Initialization
 
 	retrieve_access_token
@@ -37,7 +36,7 @@ feature {NONE} -- Initialization
 			token: OAUTH_TOKEN
 			l_date_file: DATE_TIME
 			l_date_now: DATE_TIME
-			l_diff:  INTEGER_64
+			l_diff: INTEGER_64
 		do
 			create {PLAIN_TEXT_FILE} file.make_with_name (Token_file_path_s)
 			if file.exists then
@@ -81,11 +80,11 @@ feature {NONE} -- Initialization
 				attached api_key as l_api_key
 				attached api_secret as l_api_secret
 			then
-				logger.write_debug ("get_token_from_url-> api_key:'" + l_api_key + "' secret:'" + l_api_secret + "'" )
+				logger.write_debug ("get_token_from_url-> api_key:'" + l_api_key + "' secret:'" + l_api_secret + "'")
 				create Result.make_empty
 				create config.make_default (l_api_key, l_api_secret)
 				config.set_callback ("urn:ietf:wg:oauth:2.0:oob")
-				config.set_scope ( google_auth_path_path_s )
+				config.set_scope (google_auth_path_path_s)
 				create google
 				api_service := google.create_service (config)
 				logger.write_debug ("%N===Google OAuth Workflow ===%N")
@@ -112,10 +111,10 @@ feature {NONE} -- Initialization
 
 	refresh_access_token (a_token: OAUTH_TOKEN): OAUTH_TOKEN
 			-- https://developers.google.com/identity/protocols/oauth2/limited-input-device#offline
-				--client_id=your_client_id&
-				--client_secret=your_client_secret&
-				--refresh_token=refresh_token&
-				--grant_type=refresh_token
+			--client_id=your_client_id&
+			--client_secret=your_client_secret&
+			--refresh_token=refresh_token&
+			--grant_type=refresh_token
 		require
 			attached api_key
 			attached api_secret
@@ -130,10 +129,10 @@ feature {NONE} -- Initialization
 				attached api_key as l_api_key
 				attached api_secret as l_api_secret
 			then
-				logger.write_debug ("refresh_access_token-> api_key:'" + l_api_key + "' secret:'" + l_api_secret + "'" )
+				logger.write_debug ("refresh_access_token-> api_key:'" + l_api_key + "' secret:'" + l_api_secret + "'")
 				create Result.make_empty
 				create google
-				create request.make ("POST", google.access_token_endpoint )
+				create request.make ("POST", google.access_token_endpoint)
 				request.add_body_parameter ("client_id", l_api_key)
 				request.add_body_parameter ("client_secret", l_api_secret)
 				request.add_body_parameter ("refresh_token", if attached a_token.refresh_token as l_token then l_token else "" end)
@@ -155,15 +154,14 @@ feature {NONE} -- Initialization
 feature -- Access
 
 	Token_file_path_s: STRING
-	do
-		Result := "token.access"
-	end
+		do
+			Result := "token.access"
+		end
 
 	google_auth_path_path_s: STRING
-	do
-		Result := "https://www.googleapis.com/auth/spreadsheets"
-	end
-
+		do
+			Result := "https://www.googleapis.com/auth/spreadsheets"
+		end
 
 feature -- Status Setting
 
@@ -186,9 +184,9 @@ feature -- Status Setting
 					check
 						valid_main_object: attached {JSON_OBJECT} l_json_parser.parsed_json_value as l_main_json_o
 					then
+							-- Installed
 						check
-							valid_installed: attached {JSON_OBJECT} l_main_json_o.item ("installed") as l_installed_jso
-						then
+								valid_installed: attached {JSON_OBJECT} l_main_json_o.item ("installed") as l_installed_jso then
 							check
 								has_client_id: attached {JSON_STRING} l_installed_jso.item ("client_id") as l_client_id_js_s
 							then
@@ -269,4 +267,5 @@ feature {NONE} -- Implementation
 	api_key: detachable STRING
 	api_secret: detachable STRING
 	empty_token: detachable OAUTH_TOKEN
+
 end

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<system xmlns="http://www.eiffel.com/developers/xml/configuration-1-21-0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.eiffel.com/developers/xml/configuration-1-21-0 http://www.eiffel.com/developers/xml/configuration-1-21-0.xsd" name="esheets_api" uuid="9A3C9A41-8527-4C98-949C-3278C812E0C6" library_target="esheets_api">
-	<target name="esheets_api">
+<system xmlns="http://www.eiffel.com/developers/xml/configuration-1-21-0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.eiffel.com/developers/xml/configuration-1-21-0 http://www.eiffel.com/developers/xml/configuration-1-21-0.xsd" name="escalenadar_api" uuid="7CAA645C-314C-45A2-B718-40F4B76AB41F" library_target="escalenadar_api">
+	<target name="escalenadar_api">
 		<root all_classes="true"/>
 		<file_rule>
 			<exclude>/CVS$</exclude>
@@ -18,11 +18,11 @@
 			<concurrency support="scoop"/>
 		</capability>
 		<library name="base" location="$ISE_LIBRARY\library\base\base.ecf"/>
-		<library name="encoder" location="$ISE_LIBRARY\contrib\library\web\framework\ewf\text\encoder\encoder.ecf"/>
-		<library name="json" location="$ISE_LIBRARY\contrib\library\text\parser\json\library\json.ecf" readonly="false"/>
-		<library name="http" location="$ISE_LIBRARY\contrib\library\network\protocol\http\http.ecf"/>
-		<library name="uri" location="$ISE_LIBRARY\library\text\uri\uri.ecf"/>
 		<library name="eg_base" location="..\gsuite_base\eg_base.ecf" readonly="false"/>
-		<cluster name="esheets_api" location=".\src\" recursive="true"/>
+		<library name="encoder" location="$ISE_LIBRARY\contrib\library\web\framework\ewf\text\encoder\encoder.ecf"/>
+		<library name="http" location="$ISE_LIBRARY\contrib\library\network\protocol\http\http.ecf"/>
+		<library name="json" location="$ISE_LIBRARY\contrib\library\text\parser\json\library\json.ecf" readonly="false"/>
+		<library name="uri" location="$ISE_LIBRARY\library\text\uri\uri.ecf"/>
+		<cluster name="escalenadar_api" location=".\src\" recursive="true"/>
 	</target>
 </system>
