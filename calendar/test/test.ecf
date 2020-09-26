@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<system xmlns="http://www.eiffel.com/developers/xml/configuration-1-20-0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.eiffel.com/developers/xml/configuration-1-20-0 http://www.eiffel.com/developers/xml/configuration-1-20-0.xsd" name="egsheets_test" uuid="BFF1C49C-B57D-4C81-82B8-973528B4E630">
+<system xmlns="http://www.eiffel.com/developers/xml/configuration-1-20-0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.eiffel.com/developers/xml/configuration-1-20-0 http://www.eiffel.com/developers/xml/configuration-1-20-0.xsd" name="egcalendar_test" >
 	<target name="tests">
 		<file_rule>
 			<exclude>/CVS$</exclude>
@@ -17,27 +17,17 @@
 		</capability>
 		<library name="base" location="$ISE_LIBRARY\library\base\base.ecf"/>
 		<library name="cypress_consumer" location="$ISE_LIBRARY\contrib\library\web\authentication\oauth\cypress\consumer\consumer.ecf"/>
-		<library name="esheets_api" location="..\..\sheets\esheets.ecf" readonly="false"/>
+		<library name="escalendar_api" location="..\escalendar.ecf" readonly="false"/>
 		<library name="json" location="$ISE_LIBRARY\contrib\library\text\parser\json\library\json.ecf" readonly="false"/>
-		<library name="login_with" location="$ISE_LIBRARY\contrib\library\web\authentication\oauth\cypress\login_with\login_with.ecf"/>
 		<library name="time" location="$ISE_LIBRARY\library\time\time.ecf"/>
 	</target>
-	<target name="sheets_api" extends="tests">
+	<target name="calendar_api" extends="tests">
 		<root class="TEST_CALENDAR_API" feature="make"/>
 		<option manifest_array_type="mismatch_warning">
 			<assertions precondition="true" postcondition="true" check="true" invariant="true" loop="true" supplier_precondition="true"/>
 		</option>
+		<library name="eg_base" location="..\..\gsuite_base\eg_base.ecf" readonly="false"/>
 		<library name="testing" location="$ISE_LIBRARY\library\testing\testing.ecf"/>
 		<cluster name="test" location=".\" recursive="true"/>
-		<cluster name="sheets" location="..\..\sheets\test" recursive="true"/>
-	</target>
-	<target name="sheets_i" extends="tests">
-		<root class="TEST_SHEETS_I" feature="make"/>
-		<option manifest_array_type="mismatch_warning">
-			<assertions precondition="true" postcondition="true" check="true" invariant="true" loop="true" supplier_precondition="true"/>
-		</option>
-		<library name="testing" location="$ISE_LIBRARY\library\testing\testing.ecf"/>
-		<cluster name="test" location=".\" recursive="true"/>
-		<cluster name="sheets" location="..\..\sheets\test" recursive="true"/>
 	</target>
 </system>
