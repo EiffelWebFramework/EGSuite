@@ -95,6 +95,8 @@ feature -- Implementation Factory
 				across l_sheets as ic loop
 					Result.force_sheet (eg_sheet (ic.item))
 				end
+			else
+				logger.write_warning ("eg_spreadsheet-> No defined sheets on this sheet...")
 			end
 			if attached {JSON_ARRAY} json_value (a_json, "namedRanges") as l_named_ranges then
 				across l_named_ranges as ic loop
@@ -409,6 +411,7 @@ feature {NONE} -- JSON To Eiffel
 			end
 			if attached {JSON_ARRAY} json_value (a_json, "data") as l_data then
 					-- TODO
+				Result.set_data (sheet_data (l_data))
 			end
 			if attached {JSON_ARRAY} json_value (a_json, "merges") as l_merges then
 					-- TODO
@@ -469,6 +472,7 @@ feature {NONE} -- JSON To Eiffel
 			end
 			if attached string_value_from_json (a_json, "title") as l_title then
 				Result.set_title (l_title)
+				logger.write_debug ("sheet_properties->title set: " + l_title)
 			end
 			if attached integer_value_from_json (a_json, "index") as l_index then
 				Result.set_index (l_index)
@@ -499,6 +503,21 @@ feature {NONE} -- JSON To Eiffel
 			end
 			if attached boolean_value_from_json (a_json, "rightToLeft") as l_rtl then
 				Result.set_right_to_left (l_rtl)
+			end
+		end
+
+	sheet_data (a_json_arr: JSON_ARRAY): like {EG_SHEET}.data
+		do
+			logger.write_debug ("sheet_data->")
+--			create {ARRAYED_LIST} Result.make (a_json_arr.count)
+			across
+				a_json_arr is l_json_o_item
+			loop
+				check
+					attached {JSON_OBJECT} l_json_o_item as l_jso
+				then
+
+				end
 			end
 		end
 

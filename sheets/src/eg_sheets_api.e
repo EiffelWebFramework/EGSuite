@@ -5,6 +5,8 @@ note
 
 class
 	EG_SHEETS_API
+
+
 inherit
 	LOGGABLE
 
@@ -49,6 +51,8 @@ feature -- Access
 			-- Google Sheets version
 
 feature -- Spreedsheets
+
+
 	spreadsheet_id: detachable STRING
 
 
@@ -92,7 +96,7 @@ feature -- Spreedsheets Operations
 				if l_response.status = {HTTP_STATUS_CODE}.ok then
 					Result := l_body
 
-					debug
+--					debug -- unable to enable debug on my version...
 						create l_file.make_create_read_write ("/tmp/hitme_sheet_json-get_from_id.json")
 						logger.write_information ("get_from_id->Writing body into " + l_file.path.utf_8_name)
 						l_file.close
@@ -101,7 +105,7 @@ feature -- Spreedsheets Operations
 
 						l_file.put_string (l_body)
 						l_file.close
-					end
+--					end
 				elseif l_response.status = {HTTP_STATUS_CODE}.not_found then
 					logger.write_error ("get_from_id-> Not found:" + l_response.status.out + " %NBody: " + l_body)
 				else
@@ -253,10 +257,10 @@ feature -- Error Report
 				attached last_response as l_response
 			then
 				if l_response.status = {HTTP_STATUS_CODE}.unauthorized then
-					logger.write_error ("parse_last_response->Unauthorized status, review your authorization credentials")
+					logger.write_error ("parse_last_response->Unauthorized status, rev6iew your authorization credentials")
 				end
 				if attached l_response.body as l_body then
-					logger.write_debug ("parse_last_response->body:" + l_body)
+					logger.write_debug ("parse_last_response->body, count:" + l_body.count.out)
 					create l_json_parser.make_with_string (l_body)
 					l_json_parser.parse_content
 					if l_json_parser.is_valid then
@@ -320,7 +324,7 @@ feature -- Versions
 			version_set: version.same_string ("v4")
 		end
 
-feature {NONE} -- Implementation
+feature {NONE} -- API Calls Implementation
 
 	api_post_call (a_api_url: STRING; a_params: detachable STRING_TABLE [STRING]; a_payload: detachable STRING; a_upload_data: detachable TUPLE[data:PATH; content_type: STRING])
 			-- POST REST API call for `a_api_url'
@@ -510,12 +514,33 @@ feature {NONE} -- Implementation
 			end
 		end
 
+feature -- Output
+
+	write_last_response_body (an_fp: PATH)
+		require
+			an_fp.utf_8_name.ends_with (".json")
+			attached last_response as l_lr
+			attached l_lr.body as l_body
+		local
+			l_ptf: PLAIN_TEXT_FILE
+		do
+			check
+				attached last_response as l_lr
+				attached l_lr.body as l_body
+			then
+				create l_ptf.make_create_read_write (an_fp.utf_8_name)
+				logger.write_debug ("write_last_response_body-> writting response body into: " + an_fp.utf_8_name)
+				l_ptf.put_string (l_body)
+				l_ptf.close
+			end
+		end
+
 feature -- Service Endpoint
 
 	endpooint_sheets_url: STRING  = "https://sheets.googleapis.com"
 			--  base URL that specifies the network address of an API service.
 
-feature {NONE} -- Implementation
+feature {NONE} -- Data fle Implementation
 
 	data_file: detachable PLAIN_TEXT_FILE
 

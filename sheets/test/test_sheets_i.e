@@ -26,7 +26,7 @@ feature -- {NONE}
 			retrieve_access_token
 				-- Test default.
 			logger.write_information ("Get spreadsheet from id without parameters")
-			test_get_sheet ("1j5CTkpgOc6Y5qgYdA_klZYjNhmN2KYocoZAdM4Y61tw", Void)
+--			test_get_sheet ("1j5CTkpgOc6Y5qgYdA_klZYjNhmN2KYocoZAdM4Y61tw", Void)
 --			logger.write_information ("Get spreadsheet from id with parameters")
 --			create l_param.make (2)
 --			l_param.include_grid_data (True)
@@ -49,7 +49,7 @@ feature -- Test
 		do
 			create {EG_SHEETS_JSON} l_esapi.make (last_token.token)
 			if attached {EG_SPREADSHEET} l_esapi.get_from_id (a_id, a_param) as l_spread_sheet then
-				logger.write_debug (l_spread_sheet.to_json.representation)
+				logger.write_debug ("test_get_sheet-> spreadsheet representation: " + l_spread_sheet.to_json.representation)
 			else
 				logger.write_error ("Error " + l_esapi.last_status_code.out)
 			end
