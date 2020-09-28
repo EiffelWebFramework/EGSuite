@@ -7,7 +7,15 @@ note
 class
 	EG_ROW_DATA
 
+create
+	make
 
+feature {NONE} -- Initialization
+
+	make (n: like values.count)
+		do
+			create values.make (n)
+		end
 
 feature -- Access
 

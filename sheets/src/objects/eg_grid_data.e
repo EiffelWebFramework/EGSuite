@@ -30,19 +30,16 @@ class
 
 inherit
 	ANY
-		redefine
-			default_create
-		end
+
 
 create
-	default_create
+	make
 
 feature {NONE} -- Initialization
 
-	default_create
+	make (n: like row_data.count)
 		do
-			Precursor
-			create row_data.make_empty
+			create row_data.make (n)
 		end
 
 feature -- Access

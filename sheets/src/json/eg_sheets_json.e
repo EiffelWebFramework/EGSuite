@@ -516,7 +516,9 @@ feature {NONE} -- JSON To Eiffel
 				check
 					attached {JSON_OBJECT} l_json_o_item as l_jso
 				then
-
+					check
+						continue_here: False
+					end
 				end
 			end
 		end
