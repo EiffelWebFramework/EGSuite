@@ -21,7 +21,7 @@ feature {NONE} -- Initialization
 		do
 			create last_token.make_empty
 			get_token
-			if last_token.token.is_empty then
+			if not token_is_valid then
 				logger.write_warning ("retrieve_access_token-> There is something wrong token is empty from file_path: " + Token_file_path_s)
 				check
 					not_happening: False
@@ -29,6 +29,8 @@ feature {NONE} -- Initialization
 			else
 				logger.write_debug ("retrieve_access_token-> Let's play with the API, token seems ok:" + last_token.token)
 			end
+		ensure
+			token_is_valid
 		end
 
 	get_token
@@ -65,6 +67,8 @@ feature {NONE} -- Initialization
 				logger.write_debug ("get_token-> token got from url")
 			end
 			last_token := token
+		ensure
+			token_is_valid
 		end
 
 	get_token_from_url: OAUTH_TOKEN
@@ -166,7 +170,7 @@ feature -- Status Setting
 			l_ut: FILE_UTILITIES
 		do
 			check
-				l_ut.file_exists (an_fp.utf_8_name)
+				credential_files_exists: l_ut.file_exists (an_fp.utf_8_name)
 				could_read_json_credentials_file: attached (create {JSON_FILE_READER}).read_json_from (an_fp.utf_8_name) as l_json_file_content
 			then
 				create l_json_parser.make_with_string (l_json_file_content)

@@ -13,11 +13,13 @@ create
 
 feature {NONE} -- Initialization
 
-	make (a_access_token: READABLE_STRING_32)
+	make (a_access_token: like access_token)
 		do
 				-- Using a code verifier
 			access_token := a_access_token
 			enable_version_4
+		ensure
+			access_token = a_access_token
 		end
 
 feature -- Reset
@@ -25,6 +27,8 @@ feature -- Reset
 	reset
 		do
 			create access_token.make_empty
+		ensure
+			access_token /= old access_token
 		end
 
 feature -- Access
@@ -61,6 +65,8 @@ feature -- Spreedsheets Operations
 				attached l_response.body as l_body
 			then
 				Result := l_body
+			else
+				logger.write_warning ("create_spreedsheet-> no result response and body")
 			end
 		end
 

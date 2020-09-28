@@ -7,6 +7,8 @@ note
 deferred class
 	EG_SHEETS_I
 
+inherit
+	LOGGABLE
 
 feature {NONE} -- Initialization
 

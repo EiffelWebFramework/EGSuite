@@ -42,8 +42,10 @@ feature -- Post
 				if attached parsed_json (s) as j then
 					Result := eg_spreadsheet (Void, j)
 				else
-						-- set error
+					logger.write_error ("create_spreedsheet-> No result from parsed json: " + s)
 				end
+			else
+				logger.write_error ("create_spreedsheet-> No result from API layer")
 			end
 		end
 
@@ -57,10 +59,12 @@ feature -- 	Get
 				if attached parsed_json (s) as j then
 					Result := eg_spreadsheet (Void, j)
 				else
-					-- set error
+					logger.write_error ("get_from_id-> No result from parsed json: " + s)
 				end
+			else
+				logger.write_error ("create_spreedsheet-> No result from API layer")
 			end
-	end
+		end
 
 feature -- Error
 
