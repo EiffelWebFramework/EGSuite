@@ -109,6 +109,7 @@ feature -- Tests
 		local
 			l_esapi: EG_SHEETS_API
 			l_range: STRING
+			l_qry: EG_SPREADSHEET_PARAMETERS
 		do
 			create l_esapi.make (last_token.token)
 			l_range := "Sheet1" + "!A1:A"
