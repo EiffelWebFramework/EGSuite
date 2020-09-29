@@ -92,7 +92,7 @@ feature -- Spreedsheets Operations
 				attached last_response as l_response and then
 				attached l_response.body as l_body
 			then
-				parse_last_response
+				--parse_last_response -- too much time taken to parse
 				if l_response.status = {HTTP_STATUS_CODE}.ok then
 					Result := l_body
 
@@ -260,7 +260,7 @@ feature -- Error Report
 					logger.write_error ("parse_last_response->Unauthorized status, rev6iew your authorization credentials")
 				end
 				if attached l_response.body as l_body then
-					logger.write_debug ("parse_last_response->body, count:" + l_body.count.out)
+					logger.write_debug ("parse_last_response->now parsing body, count:" + l_body.count.out)
 					create l_json_parser.make_with_string (l_body)
 					l_json_parser.parse_content
 					if l_json_parser.is_valid then
@@ -394,12 +394,13 @@ feature {NONE} -- API Calls Implementation
 
 				api_service.sign_request (ll_access_token, request)
 
-				logger.write_debug ("internal_api_call->uri:'" + request.uri + "'")
 				if attached request.upload_file as l_s then
 					logger.write_debug ("internal_api_call->upload file:'" + l_s.out + "'")
 				end
+				logger.write_debug ("internal_api_call->execute request from uri:'" + request.uri + "'")
 				if attached {OAUTH_RESPONSE} request.execute as l_response then
 					last_response := l_response
+					logger.write_debug ("internal_api_call->received response, status: " + l_response.status.out)
 				end
 			end
 			last_api_call := a_api_url.string

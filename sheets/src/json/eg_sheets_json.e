@@ -92,6 +92,7 @@ feature -- Implementation Factory
 				Result.set_protperty (eg_spreadsheet_properties (l_properties))
 			end
 			if attached {JSON_ARRAY} json_value (a_json, "sheets") as l_sheets then
+				logger.write_debug ("eg_spreadsheet-> parsing " + l_sheets.count.out + " sheets")
 				across l_sheets as ic loop
 					Result.force_sheet (eg_sheet (ic.item))
 				end
@@ -507,18 +508,19 @@ feature {NONE} -- JSON To Eiffel
 		end
 
 	sheet_data (a_json_arr: JSON_ARRAY): like {EG_SHEET}.data
+		local
+			l_item: like sheet_data.item
 		do
 			logger.write_debug ("sheet_data->")
---			create {ARRAYED_LIST} Result.make (a_json_arr.count)
+			create {ARRAYED_LIST[like sheet_data.item]} Result.make (a_json_arr.count)
 			across
 				a_json_arr is l_json_o_item
 			loop
 				check
-					attached {JSON_OBJECT} l_json_o_item as l_jso
+					is_json_object: attached {JSON_OBJECT} l_json_o_item as l_jso
 				then
-					check
-						continue_here: False
-					end
+					create l_item.make_from_json (l_jso)
+					Result.extend (l_item)
 				end
 			end
 		end
@@ -591,10 +593,14 @@ feature {NONE} -- Implementation
 		local
 			j: JSON_PARSER
 		do
+			logger.write_debug ("parsed_json-> now parsing json_text, count:" + a_json_text.count.out)
 			create j.make_with_string (a_json_text)
 			j.parse_content
+			logger.write_debug ("parsed_json-> parsed json")
 			Result := j.parsed_json_value
 			last_json := Result
+		ensure
+			last_json = Result
 		end
 
 	json_value (a_json_data: detachable JSON_VALUE; a_id: STRING): detachable JSON_VALUE
