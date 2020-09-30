@@ -406,6 +406,7 @@ feature {NONE} -- JSON To Eiffel
 	eg_sheet (a_json: JSON_VALUE): EG_SHEET
 			-- Create an object `EG_SHEET` from a json representation `a_json`.
 		do
+			logger.write_debug ("eg_sheet-> start parsing json for EG_SHEET ------------------------------------------------------------")
 			create Result
 			if attached {JSON_OBJECT} json_value (a_json, "properties") as l_properties then
 				Result.set_properties (sheet_properties (l_properties))
@@ -511,7 +512,7 @@ feature {NONE} -- JSON To Eiffel
 		local
 			l_item: like sheet_data.item
 		do
-			logger.write_debug ("sheet_data->")
+			logger.write_debug ("sheet_data-> parsing data")
 			create {ARRAYED_LIST[like sheet_data.item]} Result.make (a_json_arr.count)
 			across
 				a_json_arr is l_json_o_item
@@ -520,9 +521,11 @@ feature {NONE} -- JSON To Eiffel
 					is_json_object: attached {JSON_OBJECT} l_json_o_item as l_jso
 				then
 					create l_item.make_from_json (l_jso)
+					logger.write_debug ("sheet_data-> sheet_data item: " + l_item.out)
 					Result.extend (l_item)
 				end
 			end
+
 		end
 
 	eg_grid_range (a_json: JSON_VALUE): EG_GRID_RANGE

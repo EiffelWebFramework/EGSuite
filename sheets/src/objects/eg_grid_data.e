@@ -30,6 +30,9 @@ class
 
 inherit
 	ANY
+		redefine
+			out
+		end
 
 
 create
@@ -69,5 +72,24 @@ feature -- Access
 	row_data: ARRAYED_LIST[EG_ROW_DATA]
 --	row_metadata
 --	column_metadata
+
+feature -- Output
+
+	out: STRING
+		local
+			l_sep: STRING
+		do
+			l_sep := "%N"
+			Result := ""
+			Result.append ("row_data:")
+			across
+				row_data is l_val
+			loop
+				Result.append (l_val.out + l_sep)
+			end
+			if Result.ends_with (l_sep) then
+				Result.remove_tail (l_sep.count)
+			end
+		end
 
 end
