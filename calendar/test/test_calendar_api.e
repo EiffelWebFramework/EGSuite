@@ -11,7 +11,7 @@ inherit
 	APPLICATION_FLOW
 
 		redefine
---			Token_file_path_s,
+			Token_file_path_s,
 			google_auth_path_path_s
 		end
 
@@ -29,7 +29,7 @@ feature -- {NONE}
 			retrieve_access_token
 
 			test_list_calendars
-				--			test_create_calendar
+			test_create_calendar
 				--			test_list_primary_calendar
 				--			test_list_primary_calendar_events
 				--			test_list_calendars
@@ -38,10 +38,10 @@ feature -- {NONE}
 
 feature -- Tests
 
---	Token_file_path_s: STRING
---		do
---			Result := "/home/anders/token.access"
---		end
+	Token_file_path_s: STRING
+		do
+			Result := "/home/anders/token.access"
+		end
 
 	google_auth_path_path_s: STRING
 		do
@@ -203,8 +203,8 @@ feature -- Tests
 
 feature {NONE} -- Implementations
 
---	CREDENTIALS_PATH: STRING = "/home/anders/credentials.json" -- get this file from https://console.developers.google.com/
-	CREDENTIALS_PATH: STRING = "credentials.json" -- get this file from https://console.developers.google.com/
+	CREDENTIALS_PATH: STRING = "/home/anders/credentials.json" -- get this file from https://console.developers.google.com/
+--	CREDENTIALS_PATH: STRING = "credentials.json" -- get this file from https://console.developers.google.com/
 			-- Credentials path to json file.
 
 	impl_append_post_data_sample: STRING

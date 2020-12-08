@@ -74,7 +74,7 @@ feature -- Access
 
 	create_calendar (name_of_calendar: STRING): detachable STRING
 		do
-			api_post_call (calendar_url ("calendars", Void), Void, payload_create_calendar, Void)
+			api_post_call (calendar_url ("calendars", Void), Void, payload_create_calendar(name_of_calendar), Void)
 			if
 				attached last_response as l_response and then
 				attached l_response.body as l_body
@@ -131,12 +131,12 @@ feature -- Access
 			Result := "https://www.googleapis.com/calendar"
 		end
 
-	payload_create_calendar: STRING
+	payload_create_calendar(name:STRING): STRING
 		local
 			l_res: JSON_OBJECT
 		do
 			create l_res.make_with_capacity (5)
-			l_res.put_string ("BSharpABTODO", "summary")
+			l_res.put_string (name, "summary")
 			Result := l_res.representation
 		end
 
@@ -145,6 +145,8 @@ feature -- Access
 			EIS: "name=calendar event", "src=https://developers.google.com/calendar/v3/reference/events#resource"
 		local
 			l_res: JSON_OBJECT
+			l_jsa_start: JSON_STRING
+			l_jsa_end: JSON_ARRAY
 		do
 
 			create l_res.make_with_capacity (5)

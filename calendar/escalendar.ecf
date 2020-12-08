@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<system xmlns="http://www.eiffel.com/developers/xml/configuration-1-21-0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.eiffel.com/developers/xml/configuration-1-21-0 http://www.eiffel.com/developers/xml/configuration-1-21-0.xsd" name="escalenadar_api" uuid="7CAA645C-314C-45A2-B718-40F4B76AB41F" library_target="escalenadar_api">
+<system xmlns="http://www.eiffel.com/developers/xml/configuration-1-20-0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.eiffel.com/developers/xml/configuration-1-20-0 http://www.eiffel.com/developers/xml/configuration-1-20-0.xsd" name="escalenadar_api" uuid="7CAA645C-314C-45A2-B718-40F4B76AB41F" library_target="escalenadar_api">
 	<target name="escalenadar_api">
 		<root all_classes="true"/>
 		<file_rule>
@@ -8,20 +8,22 @@
 			<exclude>/\.git$</exclude>
 			<exclude>/\.svn$</exclude>
 		</file_rule>
-		<option warning="warning" manifest_array_type="mismatch_warning">
+		<option manifest_array_type="mismatch_warning">
 			<assertions precondition="true" postcondition="true" check="true" invariant="true" loop="true" supplier_precondition="true"/>
 		</option>
 		<setting name="console_application" value="true"/>
 		<setting name="total_order_on_reals" value="false"/>
-		<setting name="dead_code_removal" value="feature"/>
 		<capability>
 			<concurrency support="scoop"/>
+			<void_safety support="transitional"/>
 		</capability>
 		<library name="base" location="$ISE_LIBRARY\library\base\base.ecf"/>
 		<library name="eg_base" location="..\gsuite_base\eg_base.ecf" readonly="false"/>
 		<library name="encoder" location="$ISE_LIBRARY\contrib\library\web\framework\ewf\text\encoder\encoder.ecf"/>
 		<library name="http" location="$ISE_LIBRARY\contrib\library\network\protocol\http\http.ecf"/>
 		<library name="json" location="$ISE_LIBRARY\contrib\library\text\parser\json\library\json.ecf" readonly="false"/>
+		<library name="json_ext" location="\home\anders\github_eiffel_liraries\json_ext_original\json_ext\json_ext.ecf"/>
+		<library name="time" location="$ISE_LIBRARY\library\time\time.ecf"/>
 		<library name="uri" location="$ISE_LIBRARY\library\text\uri\uri.ecf"/>
 		<cluster name="escalenadar_api" location=".\src\" recursive="true"/>
 	</target>
