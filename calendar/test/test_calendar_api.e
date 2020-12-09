@@ -28,8 +28,8 @@ feature -- {NONE}
 			set_from_json_credentials_file_path (create {PATH}.make_from_string (CREDENTIALS_PATH))
 			retrieve_access_token
 
-			test_list_calendars
-			test_create_calendar
+--			test_list_calendars
+			test_create_calendar_event
 				--			test_list_primary_calendar
 				--			test_list_primary_calendar_events
 				--			test_list_calendars
@@ -200,6 +200,63 @@ feature -- Tests
 			end
 		end
 
+	test_create_calendar_event
+		require
+			token_is_valid
+		local
+			 payload: CALENDAR_EVENT_PAYLOAD
+			l_esapi: EG_CALENDAR_API
+			ce: CALENDAR_EVENT
+			start_date, end_date: CALENDAR_DATE
+			d: DATE
+			dt: DATE_TIME
+de: DATE
+			dte: DATE_TIME
+
+		do
+			create d.make_now
+			create dt.make_now
+			create start_date.make (d, dt, "Europe/Zurich")
+
+			create de.make_now
+			create dte.make_now
+			dte.minute_add (20)
+
+			create end_date.make (de, dte, "Europe/Zurich")
+			create ce.make (start_date, end_date)
+			create payload.make (ce)
+
+			create l_esapi.make (last_token.token)
+			if attached l_esapi.create_calendar_event ("primary", payload) as l_calendar_event then
+				if l_esapi.has_error then
+						--  					debug ("test_create_sheet")
+					logger.write_error ("test_create_calendar event-> Error")
+					print ("test_create_sheet-> Error: msg:" + l_esapi.error_message + "%N")
+					print ("test_create_sheet-> See codes here: https://developers.google.com/maps-booking/reference/rest-api-v3/status_codes")
+					print ("%N")
+						--					end
+					check
+						cannot_create_the_calednar_event: False
+					end
+				else
+--					check Json_Field_spreadsheetId: l_calendars.has_substring ("calendar") end
+						--					check  Json_Field_spreadsheetId: l_spreedsheet.has_substring ("spreadsheetId calendarListEntry") end
+						--					check  Json_Field_properties: l_spreedsheet.has_substring ("properties") end
+						--					check  Json_Field_sheets: l_spreedsheet.has_substring ("sheets") end
+						--					check  Json_Field_spreadsheetUrl: l_spreedsheet.has_substring ("spreadsheetUrl") end
+						-- developerMetadata and namedRanges are optional.
+						--					debug ("test_create_sheet")
+					print ("Created Calednar Event%N")
+					print (l_calendar_event)
+					print ("%N")
+						--					end
+				end
+			else
+					-- Bad scope. no connection, etc
+				check Unexptected_Behavior: False end
+			end
+		end
+
 
 feature {NONE} -- Implementations
 
@@ -207,80 +264,80 @@ feature {NONE} -- Implementations
 --	CREDENTIALS_PATH: STRING = "credentials.json" -- get this file from https://console.developers.google.com/
 			-- Credentials path to json file.
 
-	impl_append_post_data_sample: STRING
-		local
-			l_res: JSON_OBJECT
-			l_jsa_main,
-				l_jsa_line: JSON_ARRAY
-			j_array: JSON_ARRAY
+--	impl_append_post_data_sample: STRING
+--		local
+--			l_res: JSON_OBJECT
+--			l_jsa_main,
+--				l_jsa_line: JSON_ARRAY
+--			j_array: JSON_ARRAY
 
-			--{
-			--  "range": string,
-			--  "majorDimension": enum (Dimension),
-			--  "values": [
-			--    array
-			--  ]
-			--}
-			--//   "values": [
-			--    //     [
-			--    //       "Item",
-			--    //       "Cost"
-			--    //     ],
-			--    //     [
-			--    //       "Wheel",
-			--    //       "$20.50"
-			--    //     ],
-			--    //     [
-			--    //       "Door",
-			--    //       "$15"
-			--    //     ],
-			--    //     [
-			--    //       "Engine",
-			--    //       "$100"
-			--    //     ],
-			--    //     [
-			--    //       "Totals",
-			--    //       "$135.50"
-			--    //     ]
-			--    //   ]
+--			--{
+--			--  "range": string,
+--			--  "majorDimension": enum (Dimension),
+--			--  "values": [
+--			--    array
+--			--  ]
+--			--}
+--			--//   "values": [
+--			--    //     [
+--			--    //       "Item",
+--			--    //       "Cost"
+--			--    //     ],
+--			--    //     [
+--			--    //       "Wheel",
+--			--    //       "$20.50"
+--			--    //     ],
+--			--    //     [
+--			--    //       "Door",
+--			--    //       "$15"
+--			--    //     ],
+--			--    //     [
+--			--    //       "Engine",
+--			--    //       "$100"
+--			--    //     ],
+--			--    //     [
+--			--    //       "Totals",
+--			--    //       "$135.50"
+--			--    //     ]
+--			--    //   ]
 
-		do
-			create l_res.make_with_capacity (5)
-			l_res.put_string ("Sheet1!A1:B5", "range")
-			l_res.put_string ("ROWS", "majorDimension") -- "DIMENSION_UNSPECIFIED", "ROWS", "COLUMNS"
+--		do
+--			create l_res.make_with_capacity (5)
+--			l_res.put_string ("Sheet1!A1:B5", "range")
+--			l_res.put_string ("ROWS", "majorDimension") -- "DIMENSION_UNSPECIFIED", "ROWS", "COLUMNS"
 
-			create l_jsa_main.make (10)
+--			create l_jsa_main.make (10)
 
-			create j_array.make (1)
-			create l_jsa_line.make (2)
-			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("Item"))
-			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("Cost"))
-			j_array.add (l_jsa_line)
+--			create j_array.make (1)
+--			create l_jsa_line.make (2)
+--			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("Item"))
+--			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("Cost"))
+--			j_array.add (l_jsa_line)
 
-			create l_jsa_line.make (2)
-			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("Wheel"))
-			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("$20.50"))
-			j_array.add (l_jsa_line)
+--			create l_jsa_line.make (2)
+--			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("Wheel"))
+--			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("$20.50"))
+--			j_array.add (l_jsa_line)
 
-			create l_jsa_line.make (2)
-			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("Door"))
-			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("$15"))
-			j_array.add (l_jsa_line)
+--			create l_jsa_line.make (2)
+--			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("Door"))
+--			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("$15"))
+--			j_array.add (l_jsa_line)
 
-			create l_jsa_line.make (2)
-			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("Engine"))
-			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("$100"))
-			j_array.add (l_jsa_line)
+--			create l_jsa_line.make (2)
+--			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("Engine"))
+--			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("$100"))
+--			j_array.add (l_jsa_line)
 
-			create l_jsa_line.make (2)
-			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("Totals"))
-			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("$135.50"))
-			j_array.add (l_jsa_line)
+--			create l_jsa_line.make (2)
+--			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("Totals"))
+--			l_jsa_line.extend (create {JSON_STRING}.make_from_string ("$135.50"))
+--			j_array.add (l_jsa_line)
 
-			l_res.put (j_array, "values")
+--			l_res.put (j_array, "values")
 
-			Result := l_res.representation
-			logger.write_debug ("impl_append_body-> Result: '" + Result.out + "'")
-		end
+--			Result := l_res.representation
+--			logger.write_debug ("impl_append_body-> Result: '" + Result.out + "'")
+--		end
 
 end

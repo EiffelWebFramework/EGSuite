@@ -68,7 +68,7 @@ feature  -- Implementation
 		eiffel_date_time_to_json_string (a_key: STRING; a_date_time: DATE_TIME): JSON_STRING
 				-- Convert `a_date_time' to JSON_STRING with `a_key'
 			do
-				create Result.make_from_string_32 (a_date_time.formatted_out ("YYYY-[0]MM-[0]DD:[0]hh:[0]mi"))
+				create Result.make_from_string_32 (a_date_time.formatted_out ("YYYY-[0]MM-[0]DD") + "T" + a_date_time.formatted_out ("[0]hh:[0]mi")+ ":00")
 			end
 
 
@@ -93,7 +93,7 @@ feature  -- Implementation
 	convertible_features (a_object: ANY): ARRAY [STRING]
 			-- <Precursor>
 		once
-			Result := <<"date","datetime","timezone">>
+			Result := <<"datetime","timezone">>
 --			Result := <<"date","dateTime","timeZone">>
 		end
 

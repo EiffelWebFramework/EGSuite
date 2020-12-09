@@ -24,17 +24,22 @@ feature
 
 make (ce: CALENDAR_EVENT )
 do
+	kind:= "calendar#event"
+	summary := "test from Wunderlist replacer"
  create start.make_with_date (ce.sd)
  create ending.make_with_date (ce.ed)
-end
+ end
 
 default_create
 do
+ kind:= ""
+ summary:=""
  create start
  create ending
 end
 
-
+ kind: STRING
+ summary: STRING
  start:  CALENDAR_DATE_PAYLOAD
  ending:  CALENDAR_DATE_PAYLOAD
 
@@ -66,6 +71,8 @@ feature -- Implementation
 			Result.replace_substring_all ("datetime", "dateTime")
 			Result.replace_substring_all ("timezone", "timeZone")
 		end
+
+
 	metadata_refreshed (a_current: ANY): ARRAY [JSON_METADATA]
 		do
 			Result := <<
@@ -76,8 +83,7 @@ feature -- Implementation
 	convertible_features (a_object: ANY): ARRAY [STRING]
 			-- <Precursor>
 		once
---			Result := <<"start">>
-			Result := <<"start", "ending">>
+			Result := <<"summary","kind","start", "ending">>
 		end
 
 end

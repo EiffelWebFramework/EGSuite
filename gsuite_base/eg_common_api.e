@@ -223,6 +223,8 @@ feature {NONE} -- Implementation
 					request.add_header ("Content-length", a_payload.count.out)
 					request.add_header ("Content-Type", "application/json; charset=UTF-8")
 					request.add_payload (a_payload)
+					logger.write_debug ("internal_api_call->payload:'" + a_payload + "'")
+
 				else
 					request.add_header ("Content-length", "0")
 				end

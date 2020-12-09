@@ -89,7 +89,7 @@ feature -- Access
 			ending_date_exists: attached payload.ending
 
 		do
-			api_post_call (calendar_url("calendars/" + name_of_calendar + "/events", Void), Void, payload_create_calendar_event, Void)
+			api_post_call (calendar_url("calendars/" + name_of_calendar + "/events", Void), Void, payload.json_out, Void)
 			if
 				attached last_response as l_response and then
 				attached l_response.body as l_body
