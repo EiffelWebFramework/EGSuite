@@ -67,10 +67,11 @@ feature -- Test routines
 			create calendar_event.make (start_date, end_date)
 			create calendar_event_p.make (calendar_event)
 
-			expected_json := "{%"start%":{%"date%":%"" + d.formatted_out ("YYYY-[0]MM-[0]DD") + "%",%"dateTime%":%"" + dt.formatted_out ("YYYY-[0]MM-[0]DD") + "T"+ dt.formatted_out ("[0]hh:[0]mi") +
+-- Removed date might be temporary			expected_json := "{%"start%":{%"date%":%"" + d.formatted_out ("YYYY-[0]MM-[0]DD") + "%",%"dateTime%":%"" + dt.formatted_out ("YYYY-[0]MM-[0]DD") + "T"+ dt.formatted_out ("[0]hh:[0]mi") +
+			expected_json := "{%"start%":{%"dateTime%":%"" + dt.formatted_out ("YYYY-[0]MM-[0]DD") + "T"+ dt.formatted_out ("[0]hh:[0]mi") + ":00" +
 												"%",%"timeZone%":%"" + tz + "%"}" +  ",%"end%":" +
-												"{%"date%":%"" + d.formatted_out ("YYYY-[0]MM-[0]DD") + "%",%"dateTime%":%"" + dt.formatted_out ("YYYY-[0]MM-[0]DD") + "T"+ dt.formatted_out ("[0]hh:[0]mi") +
-												"%",%"timeZone%":%"" + tz + "%"}" + "}"
+												"{%"dateTime%":%"" + dt.formatted_out ("YYYY-[0]MM-[0]DD") + "T"+ dt.formatted_out ("[0]hh:[0]mi") + ":00" +
+												"%",%"timeZone%":%"" + tz + "%"}" + ",%"kind%":%"calendar#event%",%"summary%":%"test from Wunderlist replacer%"}"
 
 
 			assert_strings_equal ("Simple test of attributes", expected_json, calendar_event_p.json_out)
@@ -96,9 +97,15 @@ feature -- Test routines
 
 
 			create calendar_date.make_with_date (cd)
+-- I removed DATE as part of the json. I am not sure that it is necessary but since it is working I will stick to the new implementation
+--			expected_json := "{%"date%":%"" + d.formatted_out ("YYYY-[0]MM-[0]DD") + "%",%"dateTime%":%"" + dt.formatted_out ("YYYY-[0]MM-[0]DD") + "T" + dt.formatted_out ("[0]hh:[0]mi") +
+--												"%",%"timeZone%":%"" + tz + "%"}"
 
-			expected_json := "{%"date%":%"" + d.formatted_out ("YYYY-[0]MM-[0]DD") + "%",%"dateTime%":%"" + dt.formatted_out ("YYYY-[0]MM-[0]DD") + "T" + dt.formatted_out ("[0]hh:[0]mi") +
+
+			expected_json := "{%"dateTime%":%"" + dt.formatted_out ("YYYY-[0]MM-[0]DD") + "T" + dt.formatted_out ("[0]hh:[0]mi") + ":00" +
 												"%",%"timeZone%":%"" + tz + "%"}"
+
+
 			assert_strings_equal ("Simple test of calendar date", expected_json, calendar_date.json_out)
 
 		end
