@@ -99,6 +99,23 @@ feature -- Access
 		end
 
 
+	update_calendar_event (name_of_calendar: STRING; event_id: STRING; payload: CALENDAR_EVENT_PAYLOAD): detachable STRING
+		require
+			start_date_exists: attached payload.start
+			ending_date_exists: attached payload.ending
+
+		do
+			api_put_call (calendar_url("calendars/" + name_of_calendar + "/events/" + event_id, Void), Void, payload.json_out, Void)
+			if
+				attached last_response as l_response and then
+				attached l_response.body as l_body
+			then
+				Result := l_body
+			end
+		end
+
+
+
 feature -- Calenader URL
 
 	calendar_url (a_query: STRING; a_params: detachable STRING): STRING

@@ -156,6 +156,15 @@ feature {NONE} -- Implementation
 			internal_api_call (a_api_url, "POST", a_query_params, a_payload, a_upload_data)
 		end
 
+	api_put_call (a_api_url: STRING; a_query_params: detachable STRING_TABLE [STRING]; a_payload: detachable STRING; a_upload_data: detachable TUPLE[data:PATH; content_type: STRING])
+		note
+			eis: "name=payload_body", "src=https://tools.ietf.org/html/draft-ietf-httpbis-p3-payload-14#section-3.2", "protocol=https://tools.ietf.org/html/draft-ietf-httpbis-p3-payload-14#section-3.2"
+			-- POST REST API call for `a_api_url'
+		do
+			internal_api_call (a_api_url, "PUT", a_query_params, a_payload, a_upload_data)
+		end
+
+
 	api_delete_call (a_api_url: STRING; a_query_params: detachable STRING_TABLE [STRING])
 			-- DELETE REST API call for `a_api_url'
 		do

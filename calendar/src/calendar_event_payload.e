@@ -28,20 +28,23 @@ do
 	summary := "test from Wunderlist replacer"
  create start.make_with_date (ce.sd)
  create ending.make_with_date (ce.ed)
+ id := "testid"
  end
 
 default_create
 do
- kind:= ""
- summary:=""
- create start
- create ending
+	id := ""
+ 	kind:= ""
+ 	summary:=""
+ 	create start
+ 	create ending
 end
 
- kind: STRING
- summary: STRING
- start:  CALENDAR_DATE_PAYLOAD
- ending:  CALENDAR_DATE_PAYLOAD
+ 	id : STRING
+ 	kind: STRING
+ 	summary: STRING
+ 	start:  CALENDAR_DATE_PAYLOAD
+ 	ending:  CALENDAR_DATE_PAYLOAD
 
 
 
@@ -83,7 +86,7 @@ feature -- Implementation
 	convertible_features (a_object: ANY): ARRAY [STRING]
 			-- <Precursor>
 		once
-			Result := <<"summary","kind","start", "ending">>
+			Result := <<"summary","kind","start", "ending","id">>
 		end
 
 end
