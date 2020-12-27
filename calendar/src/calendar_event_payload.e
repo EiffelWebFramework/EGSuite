@@ -28,7 +28,7 @@ do
 	summary := "test from Wunderlist replacer"
  create start.make_with_date (ce.sd)
  create ending.make_with_date (ce.ed)
- id := "testid"
+ id := ce.id
  end
 
 default_create

@@ -224,7 +224,7 @@ feature -- Tests
 			dte.minute_add (20)
 
 			create end_date.make (de, dte, "Europe/Zurich")
-			create ce.make (start_date, end_date)
+			create ce.make (start_date, end_date, "createtesteventid123")
 			create payload.make (ce)
 
 			create l_esapi.make (last_token.token)
@@ -281,7 +281,7 @@ feature -- Tests
 			dte.minute_add (60)
 
 			create end_date.make (de, dte, "Europe/Zurich")
-			create ce.make (start_date, end_date)
+			create ce.make (start_date, end_date, "eventidupdatetest123")
 			create payload.make (ce)
 
 			create l_esapi.make (last_token.token)

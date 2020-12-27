@@ -98,11 +98,24 @@ feature -- Access
 			end
 		end
 
+		check_event_id (id: STRING) : BOOLEAN
+-- TODO Create a CALENDAR_EVENT_ID to handle the rules.
+
+--		 Google doc: Provided IDs must follow these rules:
+--				- characters allowed in the ID are those used in base32hex encoding, i.e. lowercase letters a-v and digits 0-9, see section 3.1.2 in RFC2938
+--				- the length of the ID must be between 5 and 1024 characters
+--				- the ID must be unique per calendar
+
+		do
+			Result := true
+		end
+
 
 	update_calendar_event (name_of_calendar: STRING; event_id: STRING; payload: CALENDAR_EVENT_PAYLOAD): detachable STRING
 		require
 			start_date_exists: attached payload.start
 			ending_date_exists: attached payload.ending
+			event_id_follow_google_rules : check_event_id(event_id)
 
 		do
 			api_put_call (calendar_url("calendars/" + name_of_calendar + "/events/" + event_id, Void), Void, payload.json_out, Void)
@@ -154,35 +167,6 @@ feature -- Access
 		do
 			create l_res.make_with_capacity (5)
 			l_res.put_string (name, "summary")
-			Result := l_res.representation
-		end
-
-	payload_create_calendar_event: STRING
-		note
-			EIS: "name=calendar event", "src=https://developers.google.com/calendar/v3/reference/events#resource"
-		local
-			l_res: JSON_OBJECT
-			l_jsa_start: JSON_STRING
-			l_jsa_end: JSON_ARRAY
-		do
-
-			create l_res.make_with_capacity (5)
-				-- Add the required parameters in the paylod: "start" and "end"
-				--https://developers.google.com/calendar/v3/reference/events/insert
-
-				--  "start": {
-				--    "date": date,
-				--    "dateTime": datetime,
-				--    "timeZone": string
-				--  },
-				--  "end": {
-				--    "date": date,
-				--    "dateTime": datetime,
-				--    "timeZone": string
-				--  }
-
-				--?????????????
-
 			Result := l_res.representation
 		end
 
