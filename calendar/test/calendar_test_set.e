@@ -71,7 +71,7 @@ feature -- Test routines
 			expected_json := "{%"start%":{%"dateTime%":%"" + dt.formatted_out ("YYYY-[0]MM-[0]DD") + "T"+ dt.formatted_out ("[0]hh:[0]mi") + ":00" +
 												"%",%"timeZone%":%"" + tz + "%"}" +  ",%"end%":" +
 												"{%"dateTime%":%"" + dt.formatted_out ("YYYY-[0]MM-[0]DD") + "T"+ dt.formatted_out ("[0]hh:[0]mi") + ":00" +
-												"%",%"timeZone%":%"" + tz + "%"}" + ",%"kind%":%"calendar#event%",%"summary%":%"test from Wunderlist replacer%"}"
+												"%",%"timeZone%":%"" + tz + "%"}" + ",%"kind%":%"calendar#event%",%"summary%":%"test from Wunderlist replacer%",%"id%":%"testcalendareventpaload123%"}"
 
 
 			assert_strings_equal ("Simple test of attributes", expected_json, calendar_event_p.json_out)
@@ -109,6 +109,22 @@ feature -- Test routines
 			assert_strings_equal ("Simple test of calendar date", expected_json, calendar_date.json_out)
 
 		end
+
+		test_calendar_event_id
+			local
+				calednar_api : EG_CALENDAR_API
+			do
+				create calednar_api.make ("DUMMAYSTRING")
+
+				assert_booleans_equal ("Should be a correct id", true, calednar_api.check_event_id ("aaaaaaaaaa"))
+				assert_booleans_equal ("Too few characters", false, calednar_api.check_event_id ("aaaa5"))
+				assert_booleans_equal ("Minimum nmber of characters", true, calednar_api.check_event_id ("aaaaa6"))
+				assert_booleans_equal ("Too many characters", false, calednar_api.check_event_id ( create {STRING}.make_filled ('a', 1024)))
+				assert_booleans_equal ("Maximum number if characters", true, calednar_api.check_event_id ( create {STRING}.make_filled ('a', 1023)))
+
+				assert_booleans_equal ("Uppercase not allowed", false, calednar_api.check_event_id ("aaaaAaaaaa"))
+
+			end
 
 
 feature {NONE}

@@ -108,6 +108,12 @@ feature -- Access
 
 		do
 			Result := true
+			if id.count <= 5 or id.count >= 1024 then
+				Result := false
+			elseif not id.as_lower.is_equal (id)	then
+				Result := false
+			end
+
 		end
 
 
