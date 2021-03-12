@@ -64,14 +64,14 @@ feature -- Test routines
 			create end_date.make (d, dt, tz)
 
 
-			create calendar_event.make (start_date, end_date, "testcalendareventpaload123")
+			create calendar_event.make (start_date, end_date, "test summary", "testcalendareventpaload123")
 			create calendar_event_p.make (calendar_event)
 
 -- Removed date might be temporary			expected_json := "{%"start%":{%"date%":%"" + d.formatted_out ("YYYY-[0]MM-[0]DD") + "%",%"dateTime%":%"" + dt.formatted_out ("YYYY-[0]MM-[0]DD") + "T"+ dt.formatted_out ("[0]hh:[0]mi") +
 			expected_json := "{%"start%":{%"dateTime%":%"" + dt.formatted_out ("YYYY-[0]MM-[0]DD") + "T"+ dt.formatted_out ("[0]hh:[0]mi") + ":00" +
 												"%",%"timeZone%":%"" + tz + "%"}" +  ",%"end%":" +
 												"{%"dateTime%":%"" + dt.formatted_out ("YYYY-[0]MM-[0]DD") + "T"+ dt.formatted_out ("[0]hh:[0]mi") + ":00" +
-												"%",%"timeZone%":%"" + tz + "%"}" + ",%"kind%":%"calendar#event%",%"summary%":%"test from Wunderlist replacer%",%"id%":%"testcalendareventpaload123%"}"
+												"%",%"timeZone%":%"" + tz + "%"}" + ",%"kind%":%"calendar#event%",%"summary%":%"test summary%",%"id%":%"testcalendareventpaload123%"}"
 
 
 			assert_strings_equal ("Simple test of attributes", expected_json, calendar_event_p.json_out)

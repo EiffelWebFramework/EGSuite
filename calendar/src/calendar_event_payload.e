@@ -25,11 +25,11 @@ feature
 make (ce: CALENDAR_EVENT )
 do
 	kind:= "calendar#event"
-	summary := "test from Wunderlist replacer"
- create start.make_with_date (ce.sd)
- create ending.make_with_date (ce.ed)
- id := ce.id
- end
+	summary := ce.summary
+	create start.make_with_date (ce.sd)
+ 	create ending.make_with_date (ce.ed)
+ 	id := ce.id
+end
 
 default_create
 do
