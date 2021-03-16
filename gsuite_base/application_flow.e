@@ -225,10 +225,19 @@ feature {NONE} -- Initialization
 				request.add_body_parameter ("client_id", l_api_key)
 				request.add_body_parameter ("client_secret", l_api_secret)
 				request.add_body_parameter ("refresh_token", if attached a_token.refresh_token as l_token then l_token else "" end)
+				if attached a_token.refresh_token as l_token then
+					logger.write_debug ("refresh_access_token-> refresh_token: " + l_token)
+				end
 				request.add_body_parameter ("grant_type", "refresh_token")
 				if attached request.execute as l_response then
+					logger.write_debug ("refresh_access_token-> Got Response")
 					if attached l_response.body as l_body then
+						logger.write_debug ("refresh_access_token-> Response included body" + l_body)
 						if attached {OAUTH_TOKEN} google.access_token_extractor.extract (l_body) as l_access_token then
+							logger.write_debug ("refresh_access_token-> Updating token")
+							if attached a_token.refresh_token as l_token then
+								l_access_token.set_refresh_token (l_token)
+							end
 							create {PLAIN_TEXT_FILE} file.make_create_read_write (Token_file_path_s)
 							file.put_string (serialize (l_access_token))
 							Result := l_access_token
