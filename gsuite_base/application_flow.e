@@ -263,7 +263,7 @@ feature -- Access
 
 feature -- Status Setting
 
-	set_from_json_credentials_file_path (an_fp: PATH)
+	set_from_json_credentials_file_path (an_fp: PATH)  --TODO if file does not exists it shuold not fail. It should try to create a file with correct information.
 			-- sets api_key and api_secret from given api credentials file path normally provided by google -> https://console.developers.google.com
 			-- create a Create OAuth client ID -> desktop app -> and export it to a json file with download link
 		local
