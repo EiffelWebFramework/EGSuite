@@ -19,10 +19,12 @@ feature {NONE} -- Initialization
 		local
 			l_secs: INTEGER
 		do
+			retrieve_access_token_error_has_occured := false
 			create last_token.make_empty
 			get_token
 			if last_token.token.is_empty then
 				logger.write_warning ("retrieve_access_token-> There is something wrong token is empty from file_path: " + Token_file_path_s)
+				retrieve_access_token_error_has_occured := true
 				check
 					not_happening: False
 				end
@@ -328,6 +330,8 @@ feature -- Status report
 				Result := True
 			end
 		end
+
+		retrieve_access_token_error_has_occured : BOOLEAN
 
 
 feature -- Serialize Access Token
