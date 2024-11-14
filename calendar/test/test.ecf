@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<system xmlns="http://www.eiffel.com/developers/xml/configuration-1-20-0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.eiffel.com/developers/xml/configuration-1-20-0 http://www.eiffel.com/developers/xml/configuration-1-20-0.xsd" name="egcalendar_test" uuid="B77FCEFC-E39E-4D00-A801-C35083ED62C8">
+	<target name="calendar_api">
+		<root class="TEST_CALENDAR_API" feature="make"/>
+		<file_rule>
+			<exclude>/CVS$</exclude>
+			<exclude>/EIFGENs$</exclude>
+			<exclude>/\.git$</exclude>
+			<exclude>/\.svn$</exclude>
+		</file_rule>
+		<option manifest_array_type="mismatch_warning">
+			<assertions precondition="true" postcondition="true" check="true" invariant="true" loop="true" supplier_precondition="true"/>
+		</option>
+		<setting name="console_application" value="true"/>
+		<capability>
+			<catcall_detection support="none"/>
+			<concurrency support="none"/>
+			<void_safety support="transitional"/>
+		</capability>
+		<library name="base" location="$ISE_LIBRARY\library\base\base.ecf"/>
+		<library name="cypress_consumer" location="$ISE_LIBRARY\contrib\library\web\authentication\oauth\cypress\consumer\consumer.ecf"/>
+		<library name="escalendar_api" location="..\escalendar.ecf" readonly="false"/>
+		<library name="json" location="$ISE_LIBRARY\contrib\library\text\parser\json\library\json.ecf" readonly="false"/>
+		<library name="json_ext" location="\home\anders\github_eiffel_liraries\json_ext_original\json_ext\json_ext.ecf"/>
+		<library name="eg_base" location="..\..\gsuite_base\eg_base.ecf" readonly="false"/>
+		<library name="testing" location="$ISE_LIBRARY\library\testing\testing.ecf"/>
+		<library name="time" location="$ISE_LIBRARY\library\time\time.ecf"/>
+		<cluster name="test" location=".\" recursive="true"/>
+	</target>
+</system>

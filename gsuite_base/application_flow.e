@@ -19,10 +19,12 @@ feature {NONE} -- Initialization
 		local
 			l_secs: INTEGER
 		do
+			retrieve_access_token_error_has_occured := false
 			create last_token.make_empty
 			get_token
 			if last_token.token.is_empty then
 				logger.write_warning ("retrieve_access_token-> There is something wrong token is empty from file_path: " + Token_file_path_s)
+				retrieve_access_token_error_has_occured := true
 				check
 					not_happening: False
 				end
@@ -31,13 +33,29 @@ feature {NONE} -- Initialization
 			end
 		end
 
+	read_token_from_file
+		local
+			file: FILE
+			token: OAUTH_TOKEN
+		do
+			create {PLAIN_TEXT_FILE} file.make_with_name (Token_file_path_s)
+			if file.exists then
+				file.open_read
+				file.read_stream (file.count)
+				if attached {OAUTH_TOKEN} deserialize (file.last_string) as l_token then
+					last_token := l_token
+				end
+			end
+		end
+
+
 	get_token
 		local
 			file: FILE
 			token: OAUTH_TOKEN
 			l_date_file: DATE_TIME
 			l_date_now: DATE_TIME
-			l_diff:  INTEGER_64
+			l_diff: INTEGER_64
 		do
 			create {PLAIN_TEXT_FILE} file.make_with_name (Token_file_path_s)
 			if file.exists then
@@ -67,6 +85,78 @@ feature {NONE} -- Initialization
 			last_token := token
 		end
 
+	get_authorization_url: STRING
+		require
+			attached api_key
+			attached api_secret
+		local
+			google: OAUTH_20_GOOGLE_API
+			config: OAUTH_CONFIG
+			file: FILE
+		do
+			check
+				attached api_key as l_api_key
+				attached api_secret as l_api_secret
+			then
+				logger.write_debug ("get_token_from_url-> api_key:'" + l_api_key + "' secret:'" + l_api_secret + "'")
+				create Result.make_empty
+				create config.make_default (l_api_key, l_api_secret)
+				config.set_callback ("urn:ietf:wg:oauth:2.0:oob")
+				config.set_scope (google_auth_path_path_s)
+				create google
+				my_api_service := google.create_service (config)
+				logger.write_debug ("%N===Google OAuth Workflow ===%N")
+
+					-- Obtain the Authorization URL
+				logger.write_debug ("%NFetching the Authorization URL...");
+
+				if attached my_api_service as api_service then
+					if attached api_service.authorization_url (empty_token) as lauthorization_url then
+						logger.write_debug ("%NGot the Authorization URL!%N");
+						logger.write_debug ("%NNow go and authorize here:%N");
+						Result := lauthorization_url
+					end
+				end
+			end
+		end
+
+		my_api_service: detachable OAUTH_SERVICE_I
+
+
+		set_token( autorization_code : STRING)
+		require
+			attached api_key
+			attached api_secret
+			attached my_api_service
+		local
+			google: OAUTH_20_GOOGLE_API
+			config: OAUTH_CONFIG
+--			api_service: OAUTH_SERVICE_I
+			file: FILE
+		do
+			check
+				attached api_key as l_api_key
+				attached api_secret as l_api_secret
+			then
+--				logger.write_debug ("get_token_from_url-> api_key:'" + l_api_key + "' secret:'" + l_api_secret + "'")
+
+--				create config.make_default (l_api_key, l_api_secret)
+--				config.set_callback ("urn:ietf:wg:oauth:2.0:oob")
+--				config.set_scope (google_auth_path_path_s)
+--				create google
+--				api_service := google.create_service (config)
+--				logger.write_debug ("%N===Google OAuth Workflow ===%N")
+				if attached my_api_service as api_service then
+					if attached api_service.access_token_post (empty_token, create {OAUTH_VERIFIER}.make (autorization_code)) as access_token then
+						create {PLAIN_TEXT_FILE} file.make_create_read_write (Token_file_path_s)
+						file.put_string (serialize (access_token))
+						file.flush
+						file.close
+					end
+				end
+			end
+		end
+
 	get_token_from_url: OAUTH_TOKEN
 		require
 			attached api_key
@@ -81,11 +171,11 @@ feature {NONE} -- Initialization
 				attached api_key as l_api_key
 				attached api_secret as l_api_secret
 			then
-				logger.write_debug ("get_token_from_url-> api_key:'" + l_api_key + "' secret:'" + l_api_secret + "'" )
+				logger.write_debug ("get_token_from_url-> api_key:'" + l_api_key + "' secret:'" + l_api_secret + "'")
 				create Result.make_empty
 				create config.make_default (l_api_key, l_api_secret)
 				config.set_callback ("urn:ietf:wg:oauth:2.0:oob")
-				config.set_scope ("https://www.googleapis.com/auth/spreadsheets")
+				config.set_scope (google_auth_path_path_s)
 				create google
 				api_service := google.create_service (config)
 				logger.write_debug ("%N===Google OAuth Workflow ===%N")
@@ -112,10 +202,10 @@ feature {NONE} -- Initialization
 
 	refresh_access_token (a_token: OAUTH_TOKEN): OAUTH_TOKEN
 			-- https://developers.google.com/identity/protocols/oauth2/limited-input-device#offline
-				--client_id=your_client_id&
-				--client_secret=your_client_secret&
-				--refresh_token=refresh_token&
-				--grant_type=refresh_token
+			--client_id=your_client_id&
+			--client_secret=your_client_secret&
+			--refresh_token=refresh_token&
+			--grant_type=refresh_token
 		require
 			attached api_key
 			attached api_secret
@@ -130,17 +220,26 @@ feature {NONE} -- Initialization
 				attached api_key as l_api_key
 				attached api_secret as l_api_secret
 			then
-				logger.write_debug ("refresh_access_token-> api_key:'" + l_api_key + "' secret:'" + l_api_secret + "'" )
+				logger.write_debug ("refresh_access_token-> api_key:'" + l_api_key + "' secret:'" + l_api_secret + "'")
 				create Result.make_empty
 				create google
-				create request.make ("POST", google.access_token_endpoint )
+				create request.make ("POST", google.access_token_endpoint)
 				request.add_body_parameter ("client_id", l_api_key)
 				request.add_body_parameter ("client_secret", l_api_secret)
 				request.add_body_parameter ("refresh_token", if attached a_token.refresh_token as l_token then l_token else "" end)
+				if attached a_token.refresh_token as l_token then
+					logger.write_debug ("refresh_access_token-> refresh_token: " + l_token)
+				end
 				request.add_body_parameter ("grant_type", "refresh_token")
 				if attached request.execute as l_response then
+					logger.write_debug ("refresh_access_token-> Got Response")
 					if attached l_response.body as l_body then
+						logger.write_debug ("refresh_access_token-> Response included body" + l_body)
 						if attached {OAUTH_TOKEN} google.access_token_extractor.extract (l_body) as l_access_token then
+							logger.write_debug ("refresh_access_token-> Updating token")
+							if attached a_token.refresh_token as l_token then
+								l_access_token.set_refresh_token (l_token)
+							end
 							create {PLAIN_TEXT_FILE} file.make_create_read_write (Token_file_path_s)
 							file.put_string (serialize (l_access_token))
 							Result := l_access_token
@@ -154,11 +253,19 @@ feature {NONE} -- Initialization
 
 feature -- Access
 
-	Token_file_path_s: STRING = "token.access"
+	Token_file_path_s: STRING
+		do
+			Result := "token.access"
+		end
+
+	google_auth_path_path_s: STRING
+		do
+			Result := "https://www.googleapis.com/auth/spreadsheets"
+		end
 
 feature -- Status Setting
 
-	set_from_json_credentials_file_path (an_fp: PATH)
+	set_from_json_credentials_file_path (an_fp: PATH)  --TODO if file does not exists it shuold not fail. It should try to create a file with correct information.
 			-- sets api_key and api_secret from given api credentials file path normally provided by google -> https://console.developers.google.com
 			-- create a Create OAuth client ID -> desktop app -> and export it to a json file with download link
 		local
@@ -177,9 +284,9 @@ feature -- Status Setting
 					check
 						valid_main_object: attached {JSON_OBJECT} l_json_parser.parsed_json_value as l_main_json_o
 					then
+							-- Installed
 						check
-							valid_installed: attached {JSON_OBJECT} l_main_json_o.item ("installed") as l_installed_jso
-						then
+								valid_installed: attached {JSON_OBJECT} l_main_json_o.item ("installed") as l_installed_jso then
 							check
 								has_client_id: attached {JSON_STRING} l_installed_jso.item ("client_id") as l_client_id_js_s
 							then
@@ -204,6 +311,28 @@ feature -- Status report
 		do
 			Result := not last_token.token.is_empty
 		end
+
+	has_expired: BOOLEAN
+		require
+			valid_token: token_is_valid
+		local
+			file: FILE
+			l_date_file: DATE_TIME
+			l_date_now: DATE_TIME
+			l_diff: INTEGER_64
+		do
+			read_token_from_file
+			create {PLAIN_TEXT_FILE} file.make_with_name (Token_file_path_s)
+			create l_date_file.make_from_epoch (file.date)
+			create l_date_now.make_now_utc
+			l_diff := l_date_now.definite_duration (l_date_file).seconds_count
+			if l_diff > last_token.expires_in-300 then
+				Result := True
+			end
+		end
+
+		retrieve_access_token_error_has_occured : BOOLEAN
+
 
 feature -- Serialize Access Token
 
@@ -260,4 +389,5 @@ feature {NONE} -- Implementation
 	api_key: detachable STRING
 	api_secret: detachable STRING
 	empty_token: detachable OAUTH_TOKEN
+
 end
